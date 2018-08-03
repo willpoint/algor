@@ -15,6 +15,7 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+	defer file.Close()
 
 	b1, err := ioutil.ReadAll(file)
 	if err != nil {
@@ -23,9 +24,11 @@ func main() {
 	}
 
 	start := time.Now()
-	// _ = sorting.QSort(b1)
-	_ = sorting.HeapSort(b1)
+	// st := sorting.QSort(b1)
+	st := sorting.HeapSort(b1)
+	// st := sorting.InsertionSort(b1)
 	done := time.Since(start)
+	fmt.Println(string(st))
 	fmt.Println(done)
 
 }
