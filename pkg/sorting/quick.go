@@ -17,6 +17,9 @@ func qSort(b []byte, left, right int) {
 
 func partition(b []byte, left, right int) int {
 	// TODO: Use a different strategy to select a pivot
+	// choosing left - is likely to result in the worst case
+	// for this algorithm 0(n²) rather than the
+	// average case of 0(n log n)
 	pivot := left
 	swap(b, pivot, right)
 	store := left
