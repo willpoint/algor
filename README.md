@@ -12,3 +12,7 @@
 -   **Solution** - written in **go**.
 -   **Discussion** - covering the pros and cons of the algorithm. When it would make a difference to choose it. and so on.
 - **Tests** - showing the algorithm in action, in some cases, a benchmark comparing similar algorithms.
+
+---
+
+As there is practically no way to avoid mentioning data structures in a discussion of algorithms. A package for data structures `dts` would be updated as the need arises.
