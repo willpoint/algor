@@ -4,6 +4,8 @@
 
 ---
 
+### NOTE: *This is a work in progress*
+
 ## For each algorithm presented in each package. The preceding comment would contain the following:
 
 -   **Name** of algorithm.
@@ -15,4 +17,4 @@
 
 ---
 
-As there is practically no way to avoid mentioning data structures in a discussion of algorithms. A package for data structures `dts` would be updated as the need arises.
+As there is practically no way to avoid mentioning data structures in a discussion of algorithms. A package for data structures `ds` would be updated as the need arises.
