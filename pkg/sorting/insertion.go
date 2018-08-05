@@ -11,6 +11,8 @@ package sorting
 // into the sorted subcollection
 // This algorithm works best for a small number of elements
 // or when the elements it contain exist in a nearly sorted form
+// an array already sorted in reverse order produces the worst
+// performance for this algorithm.
 // In time complexity - it's best case is 0(n)
 // and it's average and worst case is 0(n²)
 func InsertionSort(b []byte) []byte {
