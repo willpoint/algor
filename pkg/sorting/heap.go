@@ -38,8 +38,8 @@ func buildHeap(b []byte) {
 // heapify ensures that the shape property is kept
 // it does this by maintaining the rule that
 // for each child if any, the left and right values must
-// be less than the parent. It recursively to keep this
-// structure till the array is fully heapified
+// be less than the parent. It performs this recursively
+// to keep this structure till the array is fully heapified
 func heapify(b []byte, idx, max int) {
 	left := 2*idx + 1
 	right := 2*idx + 2

@@ -3,32 +3,34 @@ package main
 import (
 	"fmt"
 
-	"github.com/willpoint/algor/pkg/search"
-	_ "github.com/willpoint/algor/pkg/sorting"
+	"github.com/willpoint/algor/pkg/ds"
 )
 
 func main() {
-	// file, err := os.Open("words.txt")
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	os.Exit(1)
-	// }
-	// defer file.Close()
 
-	// b1, err := ioutil.ReadAll(file)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	os.Exit(1)
-	// }
+	ss := []string{"bear", "bell", "bid", "bull", "bully", "buy", "sell", "stock", "stop"}
 
-	// start := time.Now()
-	// // st := sorting.QSort(b1)
-	// st := sorting.HeapSort(b1)
-	// // st := sorting.InsertionSort(b1)
-	// done := time.Since(start)
-	// fmt.Println(string(st))
-	// fmt.Println(done)
-	l := search.Hash([]string{"hypoplankton"}, "man")
-	fmt.Println(l)
+	trie := ds.NewTrie()
+
+	for _, j := range ss {
+		if err := trie.Insert(j); err != nil {
+			fmt.Println(err)
+			continue
+		}
+	}
+	var f func(map[rune]*ds.TrieNode)
+	f = func(tn map[rune]*ds.TrieNode) {
+		for i, j := range tn {
+			if j == nil {
+				return
+			}
+			fmt.Printf("%s", string(i))
+			if j.External {
+				fmt.Println("|")
+			}
+			f(j.Children)
+		}
+	}
+	f(trie.Root.Children)
 
 }
