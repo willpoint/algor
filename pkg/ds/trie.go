@@ -2,7 +2,6 @@ package ds
 
 import (
 	"errors"
-	"fmt"
 )
 
 var (
@@ -36,25 +35,30 @@ type TrieNode struct {
 // one at a time by first tracing the path associated with s
 // in t.
 func (t *Trie) Insert(s string) error {
+
 	currNode := t.Root
 	index := 0
+
 	for _, j := range s {
 		if _, ok := currNode.Children[j]; ok {
 			currNode = currNode.Children[j]
 			index++
 		}
 	}
+
 	if currNode.External {
 		return ErrPrefixStringExists
 	}
+
 	for i, j := range s[index:] {
 		tnode := &TrieNode{
 			Label:    j,
 			Children: make(map[rune]*TrieNode),
 		}
 		currNode.Children[j] = tnode
+		currNode = tnode
 		if i == len(s[index:])-1 {
-			tnode.External = true
+			currNode.External = true
 			t.Words++
 		}
 	}
@@ -69,13 +73,13 @@ func (t *Trie) Insert(s string) error {
 // it returns true otherwise
 func (t *Trie) Search(s string) bool {
 	currNode := t.Root
-	count := 0
 	for _, j := range s {
 		if _, ok := currNode.Children[j]; ok {
 			currNode = currNode.Children[j]
-			count++
 		}
 	}
-	fmt.Println(count)
+	if currNode.External {
+		return true
+	}
 	return false
 }

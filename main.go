@@ -8,7 +8,7 @@ import (
 
 func main() {
 
-	ss := []string{"bull", "man", "madam", "manna", "bulk"}
+	ss := []string{"bull", "adam", "ope", "busayo"}
 
 	trie := ds.NewTrie()
 
@@ -24,15 +24,14 @@ func main() {
 			if j == nil {
 				return
 			}
-			fmt.Printf("%s ", string(i))
+			fmt.Printf("%s", string(i))
 			f(j.Children)
 			fmt.Println()
 		}
 	}
 	f(trie.Root.Children)
-	// for _, j := range ss {
-	// 	fmt.Println(trie.Search(j))
-	// }
-	// fmt.Println(trie.Words)
+	for _, j := range ss {
+		fmt.Println(trie.Search(j))
+	}
 
 }
