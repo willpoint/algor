@@ -8,7 +8,7 @@ import (
 
 func main() {
 
-	ss := []string{"bull", "adam", "ope", "busayo"}
+	ss := []string{"bear", "bell", "bid", "bull", "bully", "buy", "sell", "stock", "stop"}
 
 	trie := ds.NewTrie()
 
@@ -25,13 +25,12 @@ func main() {
 				return
 			}
 			fmt.Printf("%s", string(i))
+			if j.External {
+				fmt.Println("|")
+			}
 			f(j.Children)
-			fmt.Println()
 		}
 	}
 	f(trie.Root.Children)
-	for _, j := range ss {
-		fmt.Println(trie.Search(j))
-	}
 
 }
