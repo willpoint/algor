@@ -1,6 +1,6 @@
 package ds
 
-// LinkedList ...
+// LinkedList is a doubly linked list
 type LinkedList struct {
 	E    string
 	Prev *LinkedList
