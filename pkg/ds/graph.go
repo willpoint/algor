@@ -81,13 +81,25 @@ func (g *Graph) AddVertex(v *Vertex) error {
 	return nil
 }
 
-// BFS ...
+// BFS, when given a source vertex s, systematically explores the
+// edges of G to discover every vertex that is reachable from s
+// It computes the smallest number of edges from s to each
+// reachable vertex producing a `breadth-first-tree` with root s
+// that contains all reachable vertices.
+// To begin:
+// It discovers all vertices at distance k from s before discovering
+// vertices at distance k + 1
+// It uses colors to keep track of the progress ensuring that
+// each edge is visited only once.
+// It uses a queue Q in this implementation to keep track of the
+// traversal
 func (g *Graph) BFS(s *Vertex) {
-	Q := []*Vertex{}
 	s.Color = Gray
+
+	Q := []*Vertex{}
 	Q = append(Q, s)
 
-	for len(Q) <= 0 {
+	for len(Q) > 0 {
 
 		u := Q[0]
 		Q = Q[1:]
@@ -103,4 +115,25 @@ func (g *Graph) BFS(s *Vertex) {
 		u.Color = Black
 	}
 
+}
+
+// DFS strategy searches deeper into the graph whenever
+// possible. It explores edges out of the most discovered
+// vertex v that still has unexplored edges leaving it
+// Once all of v's edges have been explored, the search
+// `backtracks` to explore edges leaving the vertex from
+// which v was discovered
+// If any undiscovered vertices remain, then depth-first search
+// selects one of them as a new source, and it repeats the same
+// for that source.
+// When depth-first search discovers a vertex v during a scan of
+// the adjacency list of an already discovered vertex u,
+// it records this event by setting v's predecessor attribute
+// v{Predecessor} to u. The predecessor subgraph produced may
+// be composed of several trees because the search may repeat
+// from multiple sources.
+// Here the predecessor subgraph is:
+// G{Predecessor} = (V, E{Predecessor})
+func (g *Graph) DFS(s *Vertex) {
+	//
 }
