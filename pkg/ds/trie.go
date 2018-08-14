@@ -50,8 +50,7 @@ type TrieNode struct {
 }
 
 // Insert uses an incremental approach that inserts the string s
-// one at a time by first tracing the path associated with s
-// in t.
+// one at a time by first tracing the path associated with s in t.
 func (t *Trie) Insert(s string) error {
 
 	currNode := t.Root
