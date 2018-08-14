@@ -2,7 +2,6 @@ package ds
 
 import (
 	"errors"
-	"sync"
 )
 
 // Color ...
@@ -27,14 +26,26 @@ const (
 // Graph ...
 type Graph struct {
 	Adj map[string]*Vertex
-	mu  *sync.Mutex
 }
 
-// NewGraph ...
-func NewGraph() *Graph {
-	return &Graph{
+// NewGraph is a variadic function that initializes a
+// Graph G = (V, E) with a slice of slice of strings
+// representing the label for each vertex v in G.
+// The adjacency list for each vertex u ∈ V is represented
+// as elements following string at first index of the slice S[1, 1i)
+func NewGraph(ll ...[]string) *Graph {
+	G := &Graph{
 		Adj: make(map[string]*Vertex),
 	}
+	for _, j := range ll {
+		e := j[0]
+		v := NewVertex(e)
+		for i := 1; i < len(j); i++ {
+			v.AddEdge(NewVertex(j[i]))
+		}
+		G.AddVertex(v)
+	}
+	return G
 }
 
 // Vertex ...
@@ -43,8 +54,17 @@ type Vertex struct {
 	Color       Color
 	Distance    int
 	Predecessor *Vertex
-	adj         map[string]*Vertex
-	mu          *sync.Mutex
+
+	// Discovered timestamp -
+	// for when the vertex is discovered used during DFS
+	DStamp int
+
+	// Finished timestamp -
+	// for when the edges for the vertex have
+	// been completely discovered used for DFS algorithm
+	FStamp int
+
+	adj map[string]*Vertex
 }
 
 // Adjs ...
@@ -52,12 +72,12 @@ func (v *Vertex) Adjs() map[string]*Vertex {
 	return v.adj
 }
 
-// AddEdge ...
+// AddEdge adds an edge (v, w) ∈ G
+// into the adjacency list of v
+// and for a an undirected graph
+// also adds v to w's adjacency list
 func (v *Vertex) AddEdge(w *Vertex) {
-	v.mu.Lock()
-	defer v.mu.Unlock()
 	v.adj[w.Label] = w
-	w.adj[v.Label] = v
 }
 
 // NewVertex creates a new Vertex initialized with
@@ -70,10 +90,10 @@ func NewVertex(l string) *Vertex {
 	}
 }
 
-// AddVertex ...
+// AddVertex inserts vertex v into a the adjacency list
+// of graph G, and ensures no vertex is inserted more
+// than once
 func (g *Graph) AddVertex(v *Vertex) error {
-	g.mu.Lock()
-	defer g.mu.Unlock()
 	if _, ok := g.Adj[v.Label]; ok {
 		return ErrVertexExists
 	}
@@ -135,5 +155,38 @@ func (g *Graph) BFS(s *Vertex) {
 // Here the predecessor subgraph is:
 // G{Predecessor} = (V, E{Predecessor})
 func (g *Graph) DFS(s *Vertex) {
-	//
+
+	// time is a global variable
+	// Each vertex v has two timestamps, the first when it
+	// is discovered (grayed) and the second when the search finishes
+	// examining v's adjacency list (blackened). These timestamps
+	// provide certain information about the structure of the graph
+	// and are generally helpful in reasoning about the behaviour
+	// of the depth-first search
+	time := 0
+
+	var DFSVisit func(*Vertex)
+
+	DFSVisit = func(u *Vertex) {
+		time++
+		u.DStamp = time
+		u.Color = Gray
+		for _, v := range u.Adjs() {
+			if v.Color == White {
+				v.Predecessor = u
+				DFSVisit(v)
+			}
+		}
+		u.Color = Black
+		time++
+		u.FStamp = time
+
+	}
+
+	for _, u := range g.Adj {
+		if u.Color == White {
+			DFSVisit(u)
+		}
+	}
+
 }
