@@ -2,110 +2,105 @@ package ds
 
 import (
 	"errors"
+	"sync"
 )
 
-// The choice to represent a graph in this package
-// is the adjacency list |A|(adj) as it provides a compact
-// way to represent sparse graphs - for which |E| edge is much
-// less than |v2|
-// The adjacency-list representation of a graph G = (V, E)
-// consists of a slice adj of |V| lists, one for each
-// vertex in V. For each u ∈ V, the adjacency list Adj[u]
-// contains all the vertices v such that there is an edge
-// (u, v) ∈ E. That is, Adj[u] consists of all the vertices
-// adjacent to u in G or pointers to these vertices.
-// Since the adjacency list represents the edges of a graph,
-// we treat the slice Adj as an attribute of the graph
-// just as we treat the edge set E. Therefore G.Adj[u]
+// Color ...
+type Color int
 
 var (
-	ErrNotIncidentVertex = errors.New("vertex not incident on edge")
+	// ErrVertexExists ...
+	ErrVertexExists = errors.New("vertex already exists")
+)
+
+const (
+	// White represents an undiscovered vertex
+	White Color = iota
+	// Gray is discovered but becomes a frontier for
+	// discovered or undiscovered Vertices
+	Gray
+	// Black is a discovered vertex whose adjacent vertices
+	// if exists have been discovered
+	Black
 )
 
 // Graph ...
 type Graph struct {
-	Vertices []*Vertex
-	Edges    []*Edge
+	Adj map[string]*Vertex
+	mu  *sync.Mutex
 }
 
-// InsertVertex ...
-func (g *Graph) InsertVertex(l string) *Vertex {
-	return nil
-}
-
-// InsertEdges ...
-func (g *Graph) InsertEdges(v, w *Vertex, l string) *Edge {
-	e := &Edge{
-		Label:       l,
-		EndVertices: [2]*Vertex{v, w},
+// NewGraph ...
+func NewGraph() *Graph {
+	return &Graph{
+		Adj: make(map[string]*Vertex),
 	}
-	g.Edges = append(g.Edges, e)
-	return e
-}
-
-// EraseVertex ...
-func (g *Graph) EraseVertex(v *Vertex) {
-	// remove vertex v and all its incident edges
-	index := 0
-	for _, j := range g.Vertices {
-		index++
-		if j.Label == v.Label {
-			break
-		}
-	}
-	pV := g.Vertices[:index-1]
-	nV := g.Vertices[index:]
-	g.Vertices = append(pV, nV...)
-
 }
 
 // Vertex ...
 type Vertex struct {
-	Label         string
-	IncidentEdges []*Edge
-}
-
-// IsAdjacentTo ...
-func (v *Vertex) IsAdjacentTo(u *Vertex) bool {
-	for _, j := range v.IncidentEdges {
-		if j.EndVertices[0].Label == u.Label ||
-			j.EndVertices[1].Label == u.Label {
-			return true
-		}
-	}
-	return false
-}
-
-// Edge ...
-type Edge struct {
 	Label       string
-	EndVertices [2]*Vertex
+	Color       Color
+	Distance    int
+	Predecessor *Vertex
+	adj         map[string]*Vertex
+	mu          *sync.Mutex
 }
 
-// Opposite returns the end vertex of edge e distinct from
-// vertex v, and an error if e is not incident on v
-func (e *Edge) Opposite(u *Vertex) (*Vertex, error) {
-	switch {
-	case e.EndVertices[0].Label == u.Label:
-		{
-			return e.EndVertices[1], nil
-		}
-	case e.EndVertices[1].Label == u.Label:
-		{
-			return e.EndVertices[0], nil
-		}
-	default:
-		return nil, ErrNotIncidentVertex
+// Adjs ...
+func (v *Vertex) Adjs() map[string]*Vertex {
+	return v.adj
+}
+
+// AddEdge ...
+func (v *Vertex) AddEdge(w *Vertex) {
+	v.mu.Lock()
+	defer v.mu.Unlock()
+	v.adj[w.Label] = w
+	w.adj[v.Label] = v
+}
+
+// NewVertex creates a new Vertex initialized with
+// reasonable defaults
+func NewVertex(l string) *Vertex {
+	return &Vertex{
+		Label: l,
+		adj:   make(map[string]*Vertex),
+		Color: White,
 	}
 }
 
-// IsAdjacentTo tests if edges e and f are adjacent
-func (e *Edge) IsAdjacentTo(f *Edge) bool {
-	for _, j := range e.EndVertices {
-		if j.Label == f.EndVertices[0].Label ||
-			j.Label == f.EndVertices[1].Label {
-			return true
-		}
+// AddVertex ...
+func (g *Graph) AddVertex(v *Vertex) error {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	if _, ok := g.Adj[v.Label]; ok {
+		return ErrVertexExists
 	}
-	return false
+	g.Adj[v.Label] = v
+	return nil
+}
+
+// BFS ...
+func (g *Graph) BFS(s *Vertex) {
+	Q := []*Vertex{}
+	s.Color = Gray
+	Q = append(Q, s)
+
+	for len(Q) <= 0 {
+
+		u := Q[0]
+		Q = Q[1:]
+
+		for _, j := range u.Adjs() {
+			if j.Color == White {
+				j.Color = Gray
+				j.Distance = u.Distance + 1
+				j.Predecessor = u
+				Q = append(Q, j)
+			}
+		}
+		u.Color = Black
+	}
+
 }
