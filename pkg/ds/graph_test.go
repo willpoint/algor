@@ -49,7 +49,14 @@ func TestGraph_BFS(t *testing.T) {
 	err := G.BFS("dan")
 	if err != nil {
 		t.Log("expected err to be non nil")
+		t.Error(err.Error())
 	}
-	sp := G.Adj["min"].Distance
-	t.Log(sp)
+	expect := 5
+	if sp := G.Adj["min"].Distance; sp != expect {
+		t.Errorf("expected %d, got, %d", expect, sp)
+	}
+}
+
+func TestGraph_DFS(t *testing.T) {
+	//
 }
