@@ -39,12 +39,6 @@ func NewGraph(ll ...[]string) (*Graph, error) {
 		Adj: make(map[string]*Vertex),
 	}
 
-	type actions struct {
-		name   string
-		vertex int
-		adj    int
-	}
-
 	for _, j := range ll {
 		v := NewVertex(j[0])
 		for _, k := range j[1:] {
