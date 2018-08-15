@@ -12,7 +12,7 @@ func TestGraph(t *testing.T) {
 	d := []string{"dan", "wil", "imo"}
 	e := []string{"wil", "jmh"}
 
-	G := NewGraph(a, b, c, d, e)
+	G, _ := NewGraph(a, b, c, d, e)
 
 	tests := []struct {
 		name string
@@ -26,11 +26,30 @@ func TestGraph(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			have := len(G.Adj[tt.name].Adjs())
+
+			have := G.Adj[tt.name].VertexCount()
 			if have != tt.want {
-				t.Errorf("checking adj length - want %d, got %d", have, tt.want)
+				t.Errorf("checking adj length - want %d, got %d", tt.want, have)
 			}
 		})
 	}
+}
 
+func TestGraph_BFS(t *testing.T) {
+	a := []string{"abs", "jmh", "imo", "wil", "kha"}
+	b := []string{"jmh", "imo", "abs"}
+	c := []string{"imo", "abs", "kha", "wil"}
+	d := []string{"dan", "wil"}
+	e := []string{"wil", "jmh"}
+	f := []string{"kha", "min"}
+	g := []string{"min"}
+
+	G, _ := NewGraph(a, b, c, d, e, f, g)
+
+	err := G.BFS("dan")
+	if err != nil {
+		t.Log("expected err to be non nil")
+	}
+	sp := G.Adj["min"].Distance
+	t.Log(sp)
 }
