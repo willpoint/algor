@@ -154,39 +154,46 @@ func (g *Graph) BFS(label string) error {
 // from multiple sources.
 // Here the predecessor subgraph is:
 // G{Predecessor} = (V, E{Predecessor})
-// func (g *Graph) DFS(s *Vertex) {
+func (g *Graph) DFS() int {
 
-// 	// time is a global variable
-// 	// Each vertex v has two timestamps, the first when it
-// 	// is discovered (grayed) and the second when the search finishes
-// 	// examining v's adjacency list (blackened). These timestamps
-// 	// provide certain information about the structure of the graph
-// 	// and are generally helpful in reasoning about the behaviour
-// 	// of the depth-first search
-// 	time := 0
+	// time is a global variable
+	// Each vertex v has two timestamps, the first when it
+	// is discovered (grayed) and the second when the search finishes
+	// examining v's adjacency list (blackened). These timestamps
+	// provide certain information about the structure of the graph
+	// and are generally helpful in reasoning about the behaviour
+	// of the depth-first search
+	time := 0
 
-// 	var DFSVisit func(*Vertex)
+	var DFSVisit func(*Vertex)
 
-// 	DFSVisit = func(u *Vertex) {
-// 		time++
-// 		u.DStamp = time
-// 		u.Color = Gray
-// 		for _, v := range u.Adjs() {
-// 			if v.Color == White {
-// 				v.Predecessor = u
-// 				DFSVisit(v)
-// 			}
-// 		}
-// 		u.Color = Black
-// 		time++
-// 		u.FStamp = time
+	DFSVisit = func(u *Vertex) {
+		time++
+		u.DStamp = time
+		u.Color = Gray
+		// visit every node in the list containing vertices
+		// adjacent to u
+		node := u.adj.Head
+		for node != nil {
+			v, present := g.Adj[node.E]
+			if present {
+				if v.Color == White {
+					v.Predecessor = u
+					DFSVisit(v)
+				}
+			}
+			node = node.Next
+		}
+		u.Color = Black
+		time++
+		u.FStamp = time
 
-// 	}
-// 	m := *g.Adj
-// 	for _, u := range m {
-// 		if u.Color == White {
-// 			DFSVisit(u)
-// 		}
-// 	}
+	}
 
-// }
+	for _, u := range g.Adj {
+		if u.Color == White {
+			DFSVisit(u)
+		}
+	}
+	return time
+}
