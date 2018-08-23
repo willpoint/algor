@@ -66,6 +66,7 @@ func TestGraph_DFS(t *testing.T) {
 	f := []string{"kha", "dan"}
 
 	G, _ := NewGraph(a, b, c, d, e, f)
+
 	// There are 6 vertices in the generated graph
 	// given that time t is incremented twice for each vertex
 	// once for when it is discovered and once for when
