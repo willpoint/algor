@@ -47,3 +47,8 @@ func (t *BST) Insert(e string) {
 		parent.Right = nn
 	}
 }
+
+// Delete ...
+func (t *BST) Delete(n *BNode) {
+
+}

@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 func main() {
 
 	// ss := []string{"bear", "bell", "bid", "bull", "bully", "buy", "sell", "stock", "stop"}
@@ -28,10 +26,5 @@ func main() {
 	// 	}
 	// }
 	// f(trie.Root.Children)
-	a := "man"
-	b := "woman"
-	i := string(a[0])
-	j := string(b[0])
-	fmt.Println(i + j)
 
 }
