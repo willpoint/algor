@@ -165,6 +165,7 @@ func (g *Graph) DFS() int {
 	// of the depth-first search
 	time := 0
 
+	// stack := []*Vertex{} 
 	var DFSVisit func(*Vertex)
 
 	DFSVisit = func(u *Vertex) {
