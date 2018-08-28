@@ -211,5 +211,46 @@ func Identity(s int) *Matrix {
 // (a b)
 // (c d)
 // is given as ab - bc
-// however for larger  matrices `minors` and `cofactors` are
-// required
+// however for larger  matrices `minors` and `cofactors` are required
+// Minor
+// if A is an (n * n)-matrix, then the minor M(i, j), for each
+// (i, j), is the determinant of the (n-1 * n-1)-matrix obtained by
+// deleting the ith row and the jth column
+
+func det2by2(m *Matrix) (float64, error) {
+	if m.rows != 2 || m.cols != 2 {
+		return 0.0, errors.New("2 x 2 matrix dimension violated")
+	}
+	return m.elements[0]*m.elements[3] - m.elements[1]*m.elements[2], nil
+}
+
+func det3by3(m *Matrix) (float64, error) {
+	if m.rows != 3 || m.cols != 3 {
+		return 0.0, errors.New("3 x 3 matrix dimension violated")
+	}
+	return 0.0, nil
+}
+
+// ShedRow returns a new matrix with the given row removed
+func (m *Matrix) ShedRow(row int) (*Matrix, error) {
+	if row >= m.rows || row < 0 {
+		return nil, ErrRowOutOfBound
+	}
+	o := NewMatrix(m.rows-1, m.cols)
+	j := []float64{}
+	for i := 0; i < m.NumElements(); i++ {
+		if i >= (row*m.step) && i < (row*m.step+m.cols) {
+			continue
+		}
+		j = append(j, m.elements[i])
+	}
+	copy(o.elements, j)
+	return o, nil
+}
+
+// Minors ...
+func Minors(m *Matrix) *Matrix {
+	// a(0, 0)
+	// a
+	return nil
+}
