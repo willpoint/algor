@@ -36,16 +36,7 @@ func Hash(ss []string, t string) int {
 }
 
 func loadHashTable(ss []string, size int) []*ds.LinkedList {
-	ll := make([]*ds.LinkedList, size)
-	for i := 0; i < size; i++ {
-		key := hash(ss[i], size)
-		if ll[key] == nil {
-			ll[key] = &ds.LinkedList{}
-		}
-		list := ll[key]
-		list.Insert(ss[i])
-	}
-	return ll
+	return nil
 }
 
 // hash computes the key for a string using the popular

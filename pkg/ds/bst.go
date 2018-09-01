@@ -16,23 +16,34 @@ type BNode struct {
 // then Key(y) >= Key(x)
 type BST struct {
 	Root *BNode
+	Num  int // number of nodes in the tree
 }
 
 // NewBST ...
 func NewBST() *BST {
-	root := &BNode{}
-	return &BST{root}
+	return &BST{}
+}
+
+// InOrderTreeWalk ...
+func InOrderTreeWalk(t *BNode) []int {
+	r := []int{}
+	if t != nil {
+		InOrderTreeWalk(t.Left)
+		r = append(r, t.Key)
+		InOrderTreeWalk(t.Right)
+	}
+	return r
 }
 
 // Insert ...
 func (t *BST) Insert(e int) {
 
 	var parent *BNode
-
 	nn := &BNode{
 		Key: e,
 	}
 
+	t.Num++
 	currNode := t.Root
 	for currNode != nil {
 		parent = currNode
@@ -42,7 +53,6 @@ func (t *BST) Insert(e int) {
 			parent = currNode.Right
 		}
 	}
-
 	if parent == nil {
 		t.Root = nn
 	} else if parent.Key < nn.Key {

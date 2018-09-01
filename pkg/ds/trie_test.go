@@ -22,8 +22,8 @@ func TestInsert(t *testing.T) {
 		t.Errorf("expect error to be non nil")
 	}
 
-	// var f func(map[rune]*ds.TrieNode)
-	// f = func(tn map[rune]*ds.TrieNode) {
+	// var f func(map[rune]*TrieNode)
+	// f = func(tn map[rune]*TrieNode) {
 	// 	for i, j := range trie {
 	// 		if j == nil {
 	// 			return
