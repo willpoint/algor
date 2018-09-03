@@ -53,14 +53,13 @@ func (t *BST) Insert(e int) {
 			curr = curr.Right
 		}
 	}
+	nn.Parent = root
 	if root == nil {
 		t.Root = nn
 	} else if root.Key > nn.Key {
 		root.Left = nn
-		nn.Parent = root
 	} else {
 		root.Right = nn
-		nn.Parent = root
 	}
 }
 
@@ -80,4 +79,19 @@ func (t *BST) Max() int {
 		curr = curr.Right
 	}
 	return curr.Key
+}
+
+// InOrderWalk ...
+func (t *BST) InOrderWalk() []int {
+	var r []int
+	var walk func(*BNode)
+	walk = func(bn *BNode) {
+		if bn != nil {
+			walk(bn.Left)
+			r = append(r, bn.Key)
+			walk(bn.Right)
+		}
+	}
+	walk(t.Root)
+	return r
 }

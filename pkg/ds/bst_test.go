@@ -45,6 +45,23 @@ func TestBST_Max(t *testing.T) {
 	}
 	want := 15 // min of the array nn
 	if got := bst.Max(); got != want {
-		t.Errorf("BST_Min() expects %d, got %d", want, got)
+		t.Errorf("BST_Max() expects %d, got %d", want, got)
+	}
+}
+
+func TestBST_InOrderWalk(t *testing.T) {
+	type fields struct {
+		Root *BNode
+		Num  int
+	}
+	bst := NewBST()
+	nn := []int{11, 4, 7, 15, 9, 3, 6}
+	for _, v := range nn {
+		bst.Insert(v)
+	}
+	min, max := 3, 15
+	if got := bst.InOrderWalk(); got[0] != min && got[len(nn)-1] != max {
+		t.Errorf("BST_InOrderWalk() expects min to be %d and max %d, but got %d and %d",
+			min, max, got[0], got[len(nn)-1])
 	}
 }
