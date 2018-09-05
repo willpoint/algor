@@ -38,40 +38,34 @@ func InOrderTreeWalk(t *BNode) []int {
 // Insert ...
 func (t *BST) Insert(e int) {
 
-	var parent *BNode
+	var root *BNode
 	nn := &BNode{
 		Key: e,
 	}
 
 	t.Num++
-	currNode := t.Root
-	for currNode != nil {
-		parent = currNode
-		if currNode.Key < nn.Key {
-			parent = currNode.Left
+	curr := t.Root
+	for curr != nil {
+		root = curr
+		if curr.Key > nn.Key {
+			curr = curr.Left
 		} else {
-			parent = currNode.Right
+			curr = curr.Right
 		}
 	}
-	if parent == nil {
+	nn.Parent = root
+	if root == nil {
 		t.Root = nn
-	} else if parent.Key < nn.Key {
-		nn.Parent = parent
-		parent.Left = nn
+	} else if root.Key > nn.Key {
+		root.Left = nn
 	} else {
-		nn.Parent = parent
-		parent.Right = nn
+		root.Right = nn
 	}
 }
 
 // Min returns the min key
 func (t *BST) Min() int {
 	curr := t.Root
-
-	if curr.Left == nil {
-		return 0
-	}
-
 	for curr.Left != nil {
 		curr = curr.Left
 	}
@@ -81,13 +75,23 @@ func (t *BST) Min() int {
 // Max returns the max key
 func (t *BST) Max() int {
 	curr := t.Root
-
-	if curr.Right == nil {
-		return 0
-	}
-
 	for curr.Right != nil {
 		curr = curr.Right
 	}
 	return curr.Key
+}
+
+// InOrderWalk ...
+func (t *BST) InOrderWalk() []int {
+	var r []int
+	var walk func(*BNode)
+	walk = func(bn *BNode) {
+		if bn != nil {
+			walk(bn.Left)
+			r = append(r, bn.Key)
+			walk(bn.Right)
+		}
+	}
+	walk(t.Root)
+	return r
 }
