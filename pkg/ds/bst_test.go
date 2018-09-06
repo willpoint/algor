@@ -65,3 +65,40 @@ func TestBST_InOrderWalk(t *testing.T) {
 			min, max, got[0], got[len(nn)-1])
 	}
 }
+
+func TestBST_Search(t *testing.T) {
+	type fields struct {
+		Root *BNode
+		Num  int
+	}
+	bst := NewBST()
+	nn := []int{11, 4, 7, 15, 9, 3, 6}
+	for _, v := range nn {
+		bst.Insert(v)
+	}
+	if got := bst.Search(nn[2]); got.Key != nn[2] {
+		t.Errorf("Search() expected %d, got %d", nn[2], got.Key)
+	}
+}
+
+func TestBST_Delete(t *testing.T) {
+	type fields struct {
+		Root *BNode
+		Num  int
+	}
+	bst := NewBST()
+	nn := []int{11, 4, 7, 15, 9, 3, 6}
+	for _, v := range nn {
+		bst.Insert(v)
+	}
+	before := bst.Search(11)
+	err := bst.Delete(11)
+	if err != nil {
+		t.Errorf("error occured while deleting: %v", err)
+	}
+	after := bst.Search(11)
+	if before == after {
+		t.Errorf("Delete() expects before to not equal after")
+	}
+
+}
