@@ -1,5 +1,9 @@
 package ds
 
+import (
+	"fmt"
+)
+
 // BNode is a binary search tree node
 type BNode struct {
 	Key    int
@@ -22,17 +26,6 @@ type BST struct {
 // NewBST ...
 func NewBST() *BST {
 	return &BST{}
-}
-
-// InOrderTreeWalk ...
-func InOrderTreeWalk(t *BNode) []int {
-	r := []int{}
-	if t != nil {
-		InOrderTreeWalk(t.Left)
-		r = append(r, t.Key)
-		InOrderTreeWalk(t.Right)
-	}
-	return r
 }
 
 // Insert ...
@@ -63,7 +56,7 @@ func (t *BST) Insert(e int) {
 	}
 }
 
-// Min returns the min key
+// Min returns the min key of the bst
 func (t *BST) Min() int {
 	curr := t.Root
 	for curr.Left != nil {
@@ -72,7 +65,7 @@ func (t *BST) Min() int {
 	return curr.Key
 }
 
-// Max returns the max key
+// Max returns the max key of the bst
 func (t *BST) Max() int {
 	curr := t.Root
 	for curr.Right != nil {
@@ -96,30 +89,119 @@ func (t *BST) InOrderWalk() []int {
 	return r
 }
 
-// helper methods such as - if a node is a right or left child
+// Search returns the node with the key k or nil
+// if no node exists with key k
+func (t *BST) Search(k int) *BNode {
+	curr := t.Root
+	for curr != nil && curr.Key != k {
+		if k < curr.Key {
+			curr = curr.Left
+		} else {
+			curr = curr.Right
+		}
+	}
+	return curr
+}
 
-// isLeftChild assumes the node checked has a parent that is not nil
-// if node's parent p is nil - the node is root and the function
-// returns false
+// Delete deletes a node is a bst
+func (t *BST) Delete(key int) error {
+	bn := t.Search(key)
+	if bn == nil {
+		return fmt.Errorf("node with key %d does not exist", key)
+	}
+	if bn.Left == nil {
+		// left node is nil (a single child)
+		t.transplant(bn, bn.Right)
+	} else if bn.Right == nil {
+		// right node is nil (a single child)
+		t.transplant(bn, bn.Left)
+	} else {
+		// both right and left subtrees are available
+		s := treeSuccessor(bn)
+		if s.Parent != bn {
+			// the successor has min key at this point
+			// and cannot have a left child otherwise it wont be the successor
+			// so we transplant it's right child to take it's position on that subtree
+			t.transplant(s, s.Right)
+			s.Right = bn.Right
+			s.Right.Parent = s
+		}
+		t.transplant(bn, s)
+		s.Left = bn.Left
+		s.Left.Parent = bn
+	}
+	return nil
+}
+
+// helper methods for bst
+// ==============================================================
+
+// isLeftChild checks if the given node
+// is a left child of its parent
+// the node should not be the root node
 func (bn *BNode) isLeftChild() bool {
-	if bn.Parent == nil {
-		return false
-	}
-	return bn.Parent.Left == bn
+	return bn.Parent != nil && bn == bn.Parent.Left
 }
 
-// isRightChild performs the converse of of isLeftChild
+// isRightChild checks if the given node
+// is the right child of its parent
+// the node should not be the root node
 func (bn *BNode) isRightChild() bool {
-	if bn.Parent == nil {
-		return false
-	}
-	return bn.Parent.Right == bn
+	return bn.Parent != nil && bn == bn.Parent.Right
 }
 
-// transplant replaces a node u with a node v
-// making u's parent the parent of v and making v the child of u's parent
+// isRoot checks if node is root
+func isRoot(bn *BNode) bool {
+	return bn.Parent == nil
+}
+
+// min from x returns the node with the min key
+// rooted at x
+func findMin(bn *BNode) *BNode {
+	for bn.Left != nil {
+		bn = bn.Left
+	}
+	return bn
+}
+
+// findMax is symmetric to findMin
+func findMax(bn *BNode) *BNode {
+	for bn.Right != nil {
+		bn = bn.Right
+	}
+	return bn
+}
+
+// treeSuccessor of x returns the node whose key
+// is the smallest key greater than x.key
+// it returns nil if x.key is the greatest in the tree
+// successor aims to give the next node in a bst in the form
+// that is produced when an inorder tree walk is performed on the tree
+// for example when an inorder tree walk is done and it produces
+// a, b, c, d in sorted order - then the successor of a is b, and of b is c, etc
+func treeSuccessor(bn *BNode) *BNode {
+	if bn.Right == nil && bn.Left != nil { // if bn has the node with the max key return nil
+		return nil
+	}
+	if bn.Right != nil { // if bn has a right child then the smallest
+		return findMin(bn.Right)
+	}
+	// if bn has no right subtree, we move up the tree till we find a node
+	// whose parent is not a right child of it's parent
+	currParent := bn.Parent
+	for currParent != nil && bn == currParent.Right {
+		bn = currParent
+		currParent = currParent.Parent
+	}
+	return currParent
+}
+
+// transplant replaces the the subtree rooted at u
+// with the subtree rooted at v
+// setting node u's parent pointing to v as it's new child
+// and v pointing to u's parent as it new parent
 func (t *BST) transplant(u, v *BNode) {
-	if u.Parent == nil {
+	if u.Parent == nil { // case where u is the root node
 		t.Root = v
 	} else if u.isLeftChild() {
 		u.Parent.Left = v
@@ -129,40 +211,4 @@ func (t *BST) transplant(u, v *BNode) {
 	if v != nil {
 		v.Parent = u.Parent
 	}
-}
-
-// // successor can be found using two cases
-// // if there is a non empty right subtree - the node with
-// // the minimum key is return
-// // if there is no right subtree and the node in question u
-// // has a successor v, then v is the lowest ancestor of u
-// // whose left child is also an ancestor of x
-// func noop() {}
-
-// Delete a node in the bst provided as an argument (bn)
-// The logic for this method is broken into 3
-// if bn has no childern, then it is simply removed from the bst
-// by modifying it's parent to point to nil
-// if bn has a single child, the we elevate that child take bn's position
-// by modifying bn's parent to point to bn's single child
-// if bn has two children, then we find bn's successor u - which must be
-// in the bn's right subtree and update u to take bn's position, and bn's
-// left subtree becomes u's left subtree. It is important that u - the successor
-// is in bn's right subtree - to maintain the binary tree property -
-// u (right child) preceeds bn (parent) which preceeds v (left child)
-// u < p < v --- therefore v must replace p resulting in u < v
-func (t *BST) Delete(bn *BNode) {
-	//
-}
-
-// Search traverses a subtree of a BST rooted at root
-func Search(root *BNode, k int) *BNode {
-	for root != nil && root.Key != k {
-		if k < root.Key {
-			root = root.Left
-		} else {
-			root = root.Right
-		}
-	}
-	return root
 }
