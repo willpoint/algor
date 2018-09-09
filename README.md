@@ -2,7 +2,7 @@
 
 ### *Data Structures & Algorithms* in **go**.
 
-#### *This is a work in progress*
+#### *This is a work in progress* and ideas are welcome
 
 ### For each data structure and algorithm presented in `pkg`, the comments would contain the following:
 
