@@ -34,6 +34,34 @@ func NewBST() *BST {
 	return &BST{}
 }
 
+// Insert inserts into the BST
+func (t *BST) Insert(e int) {
+
+	var root *BNode
+	nn := &BNode{
+		Key: e,
+	}
+
+	t.Num++
+	curr := t.Root
+	for curr != nil {
+		root = curr
+		if curr.Key > nn.Key {
+			curr = curr.Left
+		} else {
+			curr = curr.Right
+		}
+	}
+	nn.Parent = root
+	if root == nil {
+		t.Root = nn
+	} else if root.Key > nn.Key {
+		root.Left = nn
+	} else {
+		root.Right = nn
+	}
+}
+
 // OptimizedInsert inserts a new node with key e
 // Insert tries to improve the asymptotic performance
 // when n items with identical keys are inserted
