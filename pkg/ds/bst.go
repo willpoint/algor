@@ -2,6 +2,7 @@ package ds
 
 import (
 	"fmt"
+	"math"
 )
 
 // BNode is a binary search tree node
@@ -10,6 +11,11 @@ type BNode struct {
 	Parent *BNode
 	Left   *BNode
 	Right  *BNode
+
+	// flag is used to help improve the asymptotic
+	// performance during inserts when n identical
+	// inserts are made to a an initially empty BST
+	flag bool
 }
 
 // BST is a binary search tree with root
@@ -28,8 +34,15 @@ func NewBST() *BST {
 	return &BST{}
 }
 
-// Insert ...
-func (t *BST) Insert(e int) {
+// OptimizedInsert inserts a new node with key e
+// Insert tries to improve the asymptotic performance
+// when n items with identical keys are inserted
+// into an initially empty binary BST
+// by using a strategy that checks if the key e is equal to
+// the the its parent node
+// by using a boolean flag - a local property of the
+// parent node curr -
+func (t *BST) OptimizedInsert(e int) {
 
 	var root *BNode
 	nn := &BNode{
@@ -40,7 +53,14 @@ func (t *BST) Insert(e int) {
 	curr := t.Root
 	for curr != nil {
 		root = curr
-		if curr.Key > nn.Key {
+		if nn.Key == curr.Key {
+			curr.flag = !curr.flag
+			if curr.flag {
+				curr = curr.Right
+			} else {
+				curr = curr.Left
+			}
+		} else if nn.Key < curr.Key {
 			curr = curr.Left
 		} else {
 			curr = curr.Right
@@ -49,7 +69,14 @@ func (t *BST) Insert(e int) {
 	nn.Parent = root
 	if root == nil {
 		t.Root = nn
-	} else if root.Key > nn.Key {
+	} else if nn.Key == root.Key {
+		root.flag = !root.flag
+		if root.flag {
+			root.Left = nn
+		} else {
+			root.Right = nn
+		}
+	} else if nn.Key < root.Key {
 		root.Left = nn
 	} else {
 		root.Right = nn
@@ -87,6 +114,18 @@ func (t *BST) InOrderWalk() []int {
 	}
 	walk(t.Root)
 	return r
+}
+
+// Height computes the height of a bst from its root
+func (t *BST) Height() float64 {
+	var height func(bn *BNode) float64
+	height = func(bn *BNode) float64 {
+		if bn == nil {
+			return -1
+		}
+		return 1 + math.Max(height(bn.Left), height(bn.Right))
+	}
+	return height(t.Root)
 }
 
 // Search returns the node with the key k or nil
