@@ -10,3 +10,9 @@
 -   **Description** - a high level overview of what the algorithm is designed to achieve.
 -   **Performance** - the worse, average and best case to be expected in the case of an algorithm
 -   **Tests** - showing the data structure / algorithm in action. And for argument's sake, a benchmark comparing similar algorithms.
+
+### Implemented data-structures/algrorithms
+
+* Graph Data Structure (tested)
+    * BFS algorithm (tested)
+    * DFS algorithm (tested)

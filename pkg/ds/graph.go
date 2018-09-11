@@ -165,7 +165,10 @@ func (g *Graph) DFS() int {
 	// of the depth-first search
 	time := 0
 
-	// stack := []*Vertex{} 
+	// stack := []*Vertex{}
+	// could use a stack
+	// for an iterative implementation
+	// as opposed the current recursive implementation
 	var DFSVisit func(*Vertex)
 
 	DFSVisit = func(u *Vertex) {
