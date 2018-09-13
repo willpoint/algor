@@ -30,13 +30,17 @@ var (
 // pointers pointing to NIL - which are always black in the RBT
 type RBT struct {
 	Root *RBNode
+
 	// sentinel to conserve space
-	Ext *RBNode
+	Nil *RBNode
 }
 
 // NewRBT constructs a new RBT
 func NewRBT() *RBT {
-	return &RBT{}
+	n := &RBNode{}
+	return &RBT{
+		Nil: n,
+	}
 }
 
 // RBNode is an RBT Node
@@ -51,32 +55,34 @@ type RBNode struct {
 }
 
 // NewRBNode constructs a new RBNode
+// it sets the left and right children to t.Nil
 func (t *RBT) NewRBNode(key int) *RBNode {
 	n := &RBNode{}
 	n.Key = key
-	n.Left = t.Ext
-	n.Right = t.Ext
+	n.Left = t.Nil
+	n.Right = t.Nil
 	return n
 }
 
 // left rotate pivots around the link between u and v
 // and sets v to replace u as the root of u's subtree,
 // sets u as v's left child and set v's left child as
-// u's right child. leftRotate assumes u's right node
-// is not t.ext
+// u's right child.
+// leftRotate assumes u's right node is not t.Nil
 func (t *RBT) leftRotate(u *RBNode) error {
-	if u.Right == t.Ext {
+	if u.Right == t.Nil {
 		return ErrRotatingNode
 	}
 	v := u.Right
 	u.Right = v.Left
-	if v.Left != t.Ext {
-		v.Parent = u
+	if v.Left != t.Nil {
+		v.Left.Parent = u
 	}
 
-	if u.Parent == t.Ext {
+	v.Parent = u.Parent
+	if u.Parent == t.Nil {
 		t.Root = v
-	} else if u.Parent.Left == u {
+	} else if u == u.Parent.Left {
 		u.Parent.Left = v
 	} else {
 		u.Parent.Right = v
@@ -87,22 +93,23 @@ func (t *RBT) leftRotate(u *RBNode) error {
 }
 
 // rightRotate is the inverse of leftRotate
-func (t *RBT) rightRotate(v *RBNode) error {
-	if v.Left == t.Ext {
+func (t *RBT) rightRotate(u *RBNode) error {
+	if u.Left == t.Nil {
 		return ErrRotatingNode
 	}
-	u := v.Left
-	u.Left = u.Right
-	if u.Right != t.Ext {
-		u.Parent = v
+	v := u.Left
+	u.Left = v.Right
+	if v.Right != t.Nil {
+		v.Right.Parent = u
 	}
 
-	if v.Parent == t.Ext {
-		t.Root = u
-	} else if v.Parent.Left == v {
-		v.Parent.Left = u
+	v.Parent = u.Parent
+	if u.Parent == t.Nil {
+		t.Root = v
+	} else if u == v.Parent.Left {
+		u.Parent.Left = v
 	} else {
-		v.Parent.Right = u
+		u.Parent.Right = v
 	}
 	v.Right = u
 	u.Parent = v
@@ -112,7 +119,7 @@ func (t *RBT) rightRotate(v *RBNode) error {
 // Insert ...
 func (t *RBT) Insert(k int) {
 	z := t.NewRBNode(k)
-	y := t.Ext
+	y := t.Nil
 	x := t.Root
 	for x != nil {
 		y = x
@@ -123,7 +130,7 @@ func (t *RBT) Insert(k int) {
 		}
 	}
 	z.Parent = y
-	if y == t.Ext {
+	if y == t.Nil {
 		t.Root = z
 	} else if z.Key < y.Key {
 		y.Left = z
@@ -136,9 +143,32 @@ func (t *RBT) Insert(k int) {
 
 // InsertFixUp ...
 func InsertFixUp(t *RBT, z *RBNode) {
-    // while the node just inserted has a parent that is red
-    for z.Parent.color == red {
-        // 
-        if z.Parent == z.Parent.Parent.Left
-    }
+	// since every newly inserted node is red
+	// (resulting from it's two sentinels being black)
+	// if its Parent is also red - a violation has occured
+	// so we loop till that invariant ends
+	for z.Parent.color == red {
+		// check if z is a left child, if it is
+		if z.Parent == z.Parent.Parent.Left {
+			// set y as z's uncle
+			// and check if z's uncle is red
+			y := z.Parent.Parent.Right
+			if y.color == red {
+				// check if z's uncle (y) is red
+				// and fix to meet red black tree's property
+				// with a red parent and two black children
+				z.Parent.color = black
+				y.color = black
+				z.Parent.Parent.color = red
+				z = z.Parent.Parent // move z up for the nNil iteration
+			} else {
+				if z == z.Parent.Right {
+					t.leftRotate(z)
+				}
+				z.Parent.color = black
+				z.Parent.Parent.color = red
+			}
+		}
+	}
+	t.Root.color = black
 }
