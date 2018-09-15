@@ -25,7 +25,8 @@ const (
 
 // Graph ...
 type Graph struct {
-	Adj map[string]*Vertex
+	Adj  map[string]*Vertex
+	VNum int // number of vertices in Graph
 }
 
 // NewGraph is a variadic function that initializes a
@@ -44,7 +45,11 @@ func NewGraph(ll ...[]string) (*Graph, error) {
 		for _, k := range j[1:] {
 			v.adj.AddHead(k)
 		}
+		// each adjacency list is composed of
+		// j[0] the item itself and j[1:]..., the elements
+		// making up the adjlist for j[0]
 		G.Adj[j[0]] = v
+		G.VNum++
 	}
 
 	return G, nil
@@ -115,10 +120,10 @@ func (g *Graph) BFS(label string) error {
 
 	for len(Q) > 0 {
 
-		u := Q[0]
-		Q = Q[1:]
+		u := Q[0] // pop the first vertex out of queue Q
+		Q = Q[1:] // update queue to account for the popped vertex
 
-		// LNode contains the adjacent vertices of u
+		// u.adj is a list of adjacent vertices of u
 		node := u.adj.Head
 		for node != nil {
 			v, present := g.Adj[node.E]
@@ -127,7 +132,7 @@ func (g *Graph) BFS(label string) error {
 					v.Color = Gray
 					v.Distance = u.Distance + 1
 					v.Predecessor = u
-					Q = append(Q, v)
+					Q = append(Q, v) // add vertex to queue to be visited next
 				}
 			}
 			node = node.Next
@@ -165,7 +170,6 @@ func (g *Graph) DFS() int {
 	// of the depth-first search
 	time := 0
 
-	// stack := []*Vertex{}
 	// could use a stack
 	// for an iterative implementation
 	// as opposed the current recursive implementation
@@ -173,10 +177,11 @@ func (g *Graph) DFS() int {
 
 	DFSVisit = func(u *Vertex) {
 		time++
-		u.DStamp = time
+		u.DStamp = time // discovered timestamp
 		u.Color = Gray
-		// visit every node in the list containing vertices
-		// adjacent to u
+
+		// visit every node reachable from each single
+		// encountered node recursively
 		node := u.adj.Head
 		for node != nil {
 			v, present := g.Adj[node.E]
@@ -190,7 +195,7 @@ func (g *Graph) DFS() int {
 		}
 		u.Color = Black
 		time++
-		u.FStamp = time
+		u.FStamp = time // timestamp when dfs is done on this node
 
 	}
 

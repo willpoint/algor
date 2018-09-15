@@ -72,9 +72,8 @@ func TestGraph_DFS(t *testing.T) {
 	// once for when it is discovered and once for when
 	// a dfs search has been completed for that vertex
 	// 6 * 2 is the final value of the time
-	expected := 12
-	got := G.DFS()
-	if expected != got {
+	expected := G.VNum * 2
+	if got := G.DFS(); got != expected {
 		t.Errorf("expected %d, got %d", expected, got)
 	}
 }
