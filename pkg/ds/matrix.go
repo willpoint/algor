@@ -23,6 +23,15 @@ var (
 )
 
 // Matrix is backed by a flat slice of elements
+// The example above is a 3 by 3 matrix
+// +---+---+---+
+// | 4 | 5 | 8 |
+// +---+---+---+
+// | 9 | 11| 13|
+// +---+---+---+
+// | -2| 3 | 91|
+// +---+---+---+
+// rows = 3, cols = 3, step = 3 and elements slice(cap=3*3)
 type Matrix struct {
 	rows int
 	cols int
@@ -92,6 +101,45 @@ func (m *Matrix) RowSlice(i int) []float64 {
 	c := make([]float64, m.cols)
 	copy(c, m.elements[i*m.step:i*m.step+m.cols])
 	return c
+}
+
+// SumRow adds the elememts in a row `i` of the grid
+func (m *Matrix) SumRow(i int) float64 {
+	var sum float64
+	for j := 0; j < m.cols; j++ {
+		sum += m.elements[i*m.step+j]
+	}
+	return sum
+}
+
+// SumCol adds the elements in col `j` of the grid
+func (m *Matrix) SumCol(j int) float64 {
+	var sum float64
+	for i := 0; i < m.rows; i++ {
+		sum += m.elements[i*m.step+j]
+	}
+	return sum
+}
+
+// SumDiag add the elements in the diagonal
+// this works only for square matrixes
+func (m *Matrix) SumDiag() (float64, error) {
+	var sum float64
+	if m.rows != m.cols {
+		return sum, ErrDifferentMatrixDimension
+	}
+	for i := 0; i < m.cols; i++ {
+		sum += m.elements[i*m.step+i]
+	}
+	return sum, nil
+}
+
+// Fill fills all the cells in a matrix with the value given
+// analogous to a delete of all values
+func (m *Matrix) Fill(v float64) {
+	for i := 0; i < m.NumElements(); i++ {
+		m.elements[i] = v
+	}
 }
 
 // SetRowSlice sets a single row of the matrix with the given slice
@@ -246,11 +294,4 @@ func (m *Matrix) ShedRow(row int) (*Matrix, error) {
 	}
 	copy(o.elements, j)
 	return o, nil
-}
-
-// Minors ...
-func Minors(m *Matrix) *Matrix {
-	// a(0, 0)
-	// a
-	return nil
 }
