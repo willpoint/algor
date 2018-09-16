@@ -23,7 +23,7 @@ func main() {
 
 	n := ll.Head
 	for n != nil {
-		fmt.Printf("%s-->", n.E)
+		fmt.Printf("%s->", n.E)
 		n = n.Next
 	}
 	fmt.Println()

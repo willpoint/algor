@@ -275,6 +275,44 @@ func (g *Graph) TopSort(ll *LinkedList) {
 	}
 }
 
+// IsDAG performs a DFS on the graph and then returns true
+// if the graph is a DAG ( Directed Acyclic Graph)
+// a graph that has no back edge is a DAG.
+// for edge (u, v) if u.d > v.d then there is a backedge
+func (g *Graph) IsDAG() bool {
+	backward := true
+	time := 0
+	var DFSVisit func(*Vertex)
+	DFSVisit = func(u *Vertex) {
+		time++
+		u.DStamp = time
+		u.Color = Gray
+		node := u.adj.Head
+		for node != nil {
+			v, present := g.Adj[node.E]
+			if present {
+				if v.Color == White {
+					v.Predecessor = u
+					DFSVisit(v)
+				} else if v.DStamp > u.DStamp {
+					backward = false
+					return
+				}
+			}
+			node = node.Next
+		}
+		u.Color = Black
+		time++
+		u.FStamp = time
+	}
+	for _, u := range g.Adj {
+		if u.Color == White {
+			DFSVisit(u)
+		}
+	}
+	return backward
+}
+
 // DFSi is the iterative version of a depth first search
 // on via the use of a stack
 // func (g *Graph) DFSi() int {
