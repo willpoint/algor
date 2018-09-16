@@ -2,6 +2,7 @@ package ds
 
 import (
 	"errors"
+	"fmt"
 )
 
 // Color ...
@@ -123,11 +124,11 @@ func (g *Graph) BFS(label string) error {
 		u := Q[0] // pop the first vertex out of queue Q
 		Q = Q[1:] // update queue to account for the popped vertex
 
-		// u.adj is a list of adjacent vertices of u
+		// u.adj is a list of adjacent vertices from u
 		node := u.adj.Head
 		for node != nil {
 			v, present := g.Adj[node.E]
-			if present {
+			if present { // if (u, v) is a member of E
 				if v.Color == White {
 					v.Color = Gray
 					v.Distance = u.Distance + 1
@@ -140,6 +141,35 @@ func (g *Graph) BFS(label string) error {
 		u.Color = Black
 	}
 	return nil
+}
+
+// PrintPath prints out the vertices on a shortest path from s to v
+// assuming that BFS has already computed the breadth-first tree
+// for src
+func (g *Graph) PrintPath(src, dst string) {
+	s := g.Adj[src]
+	v := g.Adj[dst]
+	if v == s {
+		fmt.Printf("%s(d-%d)\n", s.Label, s.Distance)
+	} else if v.Predecessor == nil {
+		fmt.Printf("no path from %s to %s exists\n", s.Label, v.Label)
+	} else {
+		g.PrintPath(s.Label, v.Predecessor.Label)
+		fmt.Printf("%s(d-%d)\n", v.Label, v.Distance)
+	}
+}
+
+// Diameter of a tree T = (V, E) gives the largest of all
+// shortest-path distances in the tree
+// it assumes a BFS has already been computed for the graph
+func (g *Graph) Diameter() int {
+	var max int
+	for _, v := range g.Adj {
+		if v.Distance > max {
+			max = v.Distance
+		}
+	}
+	return max
 }
 
 // DFS strategy searches deeper into the graph whenever
@@ -206,3 +236,86 @@ func (g *Graph) DFS() int {
 	}
 	return time
 }
+
+// TopSort performs a topological sort of the graph
+// while by ordering all of its vertices linearly such that
+// if graph G contains an edge (u, v), then u appears before v
+// in the ordering - the graph must not contain cycles
+// it receives as a parameter a reference to a linkedlist
+// to be contain the list of ordered vertices
+// the linkedList takes is of the string type - so the labels
+// are the expected values to be added in the linear ordering
+func (g *Graph) TopSort(ll *LinkedList) {
+	time := 0
+	var DFSVisit func(*Vertex)
+	DFSVisit = func(u *Vertex) {
+		time++
+		u.DStamp = time
+		u.Color = Gray
+		node := u.adj.Head
+		for node != nil {
+			v, present := g.Adj[node.E]
+			if present {
+				if v.Color == White {
+					v.Predecessor = u
+					DFSVisit(v)
+				}
+			}
+			node = node.Next
+		}
+		u.Color = Black
+		time++
+		u.FStamp = time
+		ll.AddHead(u.Label)
+	}
+	for _, u := range g.Adj {
+		if u.Color == White {
+			DFSVisit(u)
+		}
+	}
+}
+
+// DFSi is the iterative version of a depth first search
+// on via the use of a stack
+// func (g *Graph) DFSi() int {
+
+// 	time := 0
+
+// 	var s *Vertex
+// 	for _, v := range g.Adj {
+// 		s = v
+// 		break
+// 	}
+
+// 	time++
+// 	s.DStamp = time
+// 	s.Color = Gray
+
+// 	stack := []*Vertex{}
+// 	stack = append(stack, s)
+
+// 	for len(stack) > 0 {
+
+// 		u := stack[len(stack)-1]
+// 		stack = stack[0 : len(stack)-1]
+
+// 		node := u.adj.Head
+// 		for node != nil {
+// 			v, present := g.Adj[node.E]
+// 			if present {
+// 				if v.Color == White {
+// 					time++
+// 					v.DStamp = time
+// 					v.Predecessor = u
+// 					v.Color = Gray
+// 					stack = append(stack, v)
+// 				}
+// 			}
+// 			node = node.Next
+// 		}
+// 		time++
+// 		u.FStamp = time
+// 		u.Color = Black
+// 	}
+// 	return time
+// }

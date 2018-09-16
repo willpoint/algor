@@ -6,7 +6,7 @@ import (
 
 func TestGraph(t *testing.T) {
 
-	a := []string{"abs", "jmh", "imo", "wil", "kha"}
+	a := []string{"abs", "jmh", "imo", "wil"}
 	b := []string{"jmh", "imo", "abs"}
 	c := []string{"imo", "abs", "kha", "wil"}
 	d := []string{"dan", "wil", "imo"}
