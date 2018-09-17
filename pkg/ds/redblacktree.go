@@ -141,26 +141,23 @@ func (t *RBT) Insert(k int) {
 	InsertFixUp(t, z)
 }
 
-// InsertFixUp ...
+// InsertFixUp ensures all violations encountered after
+// inserting node z is fixed using a set of invariants
+// one of which is that there is a violation as long
+// as z's Parent is red
 func InsertFixUp(t *RBT, z *RBNode) {
-	// since every newly inserted node is red
-	// (resulting from it's two sentinels being black)
-	// if its Parent is also red - a violation has occured
-	// so we loop till that invariant ends
 	for z.Parent.color == red {
-		// check if z is a left child, if it is
 		if z.Parent == z.Parent.Parent.Left {
-			// set y as z's uncle
-			// and check if z's uncle is red
 			y := z.Parent.Parent.Right
 			if y.color == red {
-				// check if z's uncle (y) is red
-				// and fix to meet red black tree's property
-				// with a red parent and two black children
 				z.Parent.color = black
 				y.color = black
 				z.Parent.Parent.color = red
+<<<<<<< HEAD
 				z = z.Parent.Parent // move z up for the next iteration
+=======
+				z = z.Parent.Parent
+>>>>>>> 45d20efeae58e753ea1f0d76d34b848fba8b0bf5
 			} else {
 				if z == z.Parent.Right {
 					t.leftRotate(z)

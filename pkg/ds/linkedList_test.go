@@ -14,18 +14,9 @@ func TestLinkedList(t *testing.T) {
 		l.AddHead(j)
 	}
 
-	count := 0
-	node := l.Head
-	for node != nil {
-		if node.Next != nil {
-			count++
-		}
-		node = node.Next
-	}
-
-	expected := len(ss)
-	if count != expected {
-		t.Errorf("Expected %d, got %d", expected, count)
+	count := len(ss)
+	if count != l.Length {
+		t.Errorf("Expected %d, got %d", count, l.Length)
 	}
 
 	tv := l.Has("c/c++")

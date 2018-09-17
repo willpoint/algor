@@ -8,8 +8,7 @@ type LinkedList struct {
 
 // NewLinkedList ...
 func NewLinkedList() *LinkedList {
-	head := &LNode{}
-	return &LinkedList{head, 0}
+	return &LinkedList{}
 }
 
 // LNode is a doubly linked list
@@ -27,11 +26,18 @@ func NewLNode(e string) *LNode {
 }
 
 // AddHead adds a new element to the head of the LNode
+// if head is does not exist then the first element becomes
+// the element at head
 func (ll *LinkedList) AddHead(e string) {
-	old := ll.Head
-	nl := NewLNode(e)
-	ll.Head = nl
-	ll.Head.Next = old
+	head := ll.Head
+	nn := NewLNode(e)
+	if head == nil {
+		ll.Head = nn
+	} else {
+		nn.Next = head
+		head.Prev = nn
+		ll.Head = nn
+	}
 	ll.Length++
 }
 
