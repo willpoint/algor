@@ -3,7 +3,7 @@ package ds
 import "testing"
 
 func TestRBT_leftRotate(t *testing.T) {
-	// Nil :=
+	// set up a manual rbt with a root and a left and right child
 	rbt := NewRBT()
 	n1 := rbt.NewRBNode(10) // root node
 	n1.Parent = rbt.Nil     // parent points to t.Nil
@@ -25,12 +25,12 @@ func TestRBT_leftRotate(t *testing.T) {
 }
 
 func TestRBT_rightRotate(t *testing.T) {
-	// Nil :=
+	// set up a manual rbt with a root and a left and right child
 	rbt := NewRBT()
-	n1 := rbt.NewRBNode(10) // root node
+	n1 := rbt.NewRBNode(97) // root node
 	n1.Parent = rbt.Nil     // parent points to t.Nil
-	n2 := rbt.NewRBNode(5)
-	n3 := rbt.NewRBNode(13)
+	n2 := rbt.NewRBNode(65)
+	n3 := rbt.NewRBNode(100)
 	rbt.Root = n1
 	rbt.Root.Left = n2
 	rbt.Root.Right = n3

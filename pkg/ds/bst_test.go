@@ -66,18 +66,37 @@ func TestBST_InOrderWalk(t *testing.T) {
 	}
 }
 
-func BenchmarkBST_InorderWalk(b *testing.B) {
+func BenchmarkBST_OptimizedInsert(b *testing.B) {
+	// This benchmark checks the performance of optimized insert
+	// by checking the impact on a BST Search by inserting into an
+	// initial BST a series of equal numbers and search for the a different
+	// number inserted at a later time during the insertion
 	bst := NewBST()
-	// this benchmark is to test the impact of the improvement to
-	// the BST_Insert() function for n insertions of identical keys
-	// nn := []int{5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5}
-	nn := []int{4, 9, 11, 3, 12, 1, 8, 32, 91, 44, 31, 13, 1, 15, 30}
+	nn := []int{5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 9}
+	for _, v := range nn {
+		bst.InsertOptimized(v)
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		bst.Search(9)
+	}
+}
+
+func BenchmarkBST_Insert(b *testing.B) {
+	// This benchmark checks the performance of optimized insert
+	// by checking the impact on a BST Search by inserting into an
+	// initial BST a series of equal numbers and search for the a different
+	// number inserted at a later time during the insertion
+	bst := NewBST()
+	nn := []int{5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 9}
 	for _, v := range nn {
 		bst.Insert(v)
 	}
+
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		bst.InOrderWalk()
+		bst.Search(9)
 	}
 }
 

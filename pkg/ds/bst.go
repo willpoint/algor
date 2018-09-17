@@ -62,7 +62,7 @@ func (t *BST) Insert(e int) {
 	}
 }
 
-// OptimizedInsert inserts a new node with key e
+// InsertOptimized inserts a new node with key e
 // Insert tries to improve the asymptotic performance
 // when n items with identical keys are inserted
 // into an initially empty binary BST
@@ -70,7 +70,7 @@ func (t *BST) Insert(e int) {
 // the the its parent node
 // by using a boolean flag - a local property of the
 // parent node curr -
-func (t *BST) OptimizedInsert(e int) {
+func (t *BST) InsertOptimized(e int) {
 
 	var root *BNode
 	nn := &BNode{

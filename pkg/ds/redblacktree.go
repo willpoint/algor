@@ -160,7 +160,7 @@ func InsertFixUp(t *RBT, z *RBNode) {
 				z.Parent.color = black
 				y.color = black
 				z.Parent.Parent.color = red
-				z = z.Parent.Parent // move z up for the nNil iteration
+				z = z.Parent.Parent // move z up for the next iteration
 			} else {
 				if z == z.Parent.Right {
 					t.leftRotate(z)
