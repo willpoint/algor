@@ -7,7 +7,6 @@ import (
 )
 
 func main() {
-
 	a := []string{"undershorts", "shoes", "pants"}
 	b := []string{"pants", "belt", "shoes"}
 	c := []string{"belt", "jacket"}
@@ -18,14 +17,15 @@ func main() {
 	h := []string{"watch"}
 	i := []string{"shoes"}
 	G, _ := ds.NewGraph(a, b, c, d, e, f, g, h, i)
-	ll := ds.NewLinkedList()
-	G.TopSort(ll)
 
-	n := ll.Head
-	for n != nil {
-		fmt.Printf("%s->", n.E)
-		n = n.Next
-	}
-	fmt.Println()
+	n := G.VNum
+	fmt.Println(n)
+	n1 := G.DFS()
+	fmt.Println(n1)
 
+	GT := ds.GraphTranspose(G)
+	nt := GT.VNum
+	fmt.Println(nt)
+	nt1 := GT.DFS()
+	fmt.Println(nt1)
 }

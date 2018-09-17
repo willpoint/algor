@@ -95,6 +95,38 @@ func NewVertex(l string) *Vertex {
 	}
 }
 
+// GraphTranspose of Graph G, Gt is graph G with all its
+// edges revered
+// Transpose of G = (V, E) is graph Gt = (V, Et)
+func GraphTranspose(g *Graph) *Graph {
+	gt := &Graph{}
+	gt.Adj = make(map[string]*Vertex)
+
+	for _, v := range g.Adj {
+		if _, ok := gt.Adj[v.Label]; !ok {
+            gt.Adj[v.Label] = NewVertex(v.Label)
+            gt.VNum++
+		}
+		// for each vertex->vertexList in g.Adj
+		// v is the vertex
+		// v.adj is the vertexList v points to
+		// the goal is to make all elements of v.adj
+		// point to a in their respective vertex
+		// within the new graph gt
+		curr := v.adj.Head
+		for curr != nil {
+			_, exists := gt.Adj[curr.E]
+			if !exists {
+				gt.Adj[curr.E] = NewVertex(curr.E)
+				gt.VNum++
+			}
+			gt.Adj[curr.E].adj.AddHead(v.Label)
+			curr = curr.Next
+		}
+	}
+	return gt
+}
+
 // BFS when given a source vertex s, systematically explores the
 // edges of G to discover every vertex that is reachable from s
 // `It computes the smallest number of edges from s to each
@@ -312,48 +344,3 @@ func (g *Graph) IsDAG() bool {
 	}
 	return backward
 }
-
-// DFSi is the iterative version of a depth first search
-// on via the use of a stack
-// func (g *Graph) DFSi() int {
-
-// 	time := 0
-
-// 	var s *Vertex
-// 	for _, v := range g.Adj {
-// 		s = v
-// 		break
-// 	}
-
-// 	time++
-// 	s.DStamp = time
-// 	s.Color = Gray
-
-// 	stack := []*Vertex{}
-// 	stack = append(stack, s)
-
-// 	for len(stack) > 0 {
-
-// 		u := stack[len(stack)-1]
-// 		stack = stack[0 : len(stack)-1]
-
-// 		node := u.adj.Head
-// 		for node != nil {
-// 			v, present := g.Adj[node.E]
-// 			if present {
-// 				if v.Color == White {
-// 					time++
-// 					v.DStamp = time
-// 					v.Predecessor = u
-// 					v.Color = Gray
-// 					stack = append(stack, v)
-// 				}
-// 			}
-// 			node = node.Next
-// 		}
-// 		time++
-// 		u.FStamp = time
-// 		u.Color = Black
-// 	}
-// 	return time
-// }
