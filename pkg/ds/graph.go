@@ -104,8 +104,8 @@ func GraphTranspose(g *Graph) *Graph {
 
 	for _, v := range g.Adj {
 		if _, ok := gt.Adj[v.Label]; !ok {
-            gt.Adj[v.Label] = NewVertex(v.Label)
-            gt.VNum++
+			gt.Adj[v.Label] = NewVertex(v.Label)
+			gt.VNum++
 		}
 		// for each vertex->vertexList in g.Adj
 		// v is the vertex
@@ -343,4 +343,50 @@ func (g *Graph) IsDAG() bool {
 		}
 	}
 	return backward
+}
+
+// DFSi is an iterative implementation of DFS
+// using a stack returning the count for the last
+// finishing time recoreded for each visit
+func (g *Graph) DFSi() int {
+
+	time := 0
+
+	var s *Vertex
+	for _, k := range g.Adj {
+		s = k
+		break
+	}
+	s.Color = Gray
+	time++
+	s.DStamp = time
+
+	stack := []*Vertex{}
+	stack = append(stack, s)
+
+	for len(stack) > 0 {
+
+		u := stack[len(stack)-1]
+		stack = stack[0 : len(stack)-1]
+
+		node := u.adj.Head
+		for node != nil {
+			v, present := g.Adj[node.E]
+			if present {
+				if v.Color == White {
+					v.Predecessor = u
+					v.Color = Gray
+					time++
+					v.DStamp = time
+					stack = append(stack, v)
+				}
+			}
+			node = node.Next
+		}
+		u.Color = Black
+		time++
+		u.FStamp = time
+	}
+	return time
+
 }
