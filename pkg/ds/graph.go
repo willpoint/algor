@@ -62,17 +62,22 @@ type Graph struct {
 	ENum int // number of edges in the G.E
 }
 
-// NewGraph is a variadic function that initializes a
+// NewGraph returns a references to a new Graph G
+func NewGraph() *Graph {
+	return &Graph{
+		V: make(map[string]*Vertex),
+		E: make(map[*Edge]struct{}),
+	}
+}
+
+// BuildGraph is a variadic function that initializes a
 // Graph G = (V, E) with a slice of slice of strings
 // representing the label for each vertex v in G.
 // The adjacency list for each vertex u ∈ V is represented
 // as elements following string at first index of the slice S[1, 1i)
-func NewGraph(ll ...[]string) (*Graph, error) {
+func BuildGraph(ll ...[]string) (*Graph, error) {
 
-	G := &Graph{
-		V: make(map[string]*Vertex),
-		E: make(map[*Edge]struct{}),
-	}
+	G := NewGraph()
 
 	for _, j := range ll {
 		v := NewVertex(j[0])

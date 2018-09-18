@@ -12,7 +12,7 @@ func TestGraph(t *testing.T) {
 	d := []string{"dan", "wil", "imo"}
 	e := []string{"wil", "jmh"}
 
-	G, _ := NewGraph(a, b, c, d, e)
+	G, _ := BuildGraph(a, b, c, d, e)
 
 	tests := []struct {
 		name string
@@ -50,7 +50,7 @@ func TestGraph_BFS(t *testing.T) {
 	f := []string{"kha", "min"}
 	g := []string{"min", "kha"}
 
-	G, _ := NewGraph(a, b, c, d, e, f, g)
+	G, _ := BuildGraph(a, b, c, d, e, f, g)
 
 	err := G.BFS("dan")
 	if err != nil {
@@ -71,7 +71,7 @@ func TestGraph_DFS(t *testing.T) {
 	e := []string{"wil", "jmh"}
 	f := []string{"kha", "dan"}
 
-	G, _ := NewGraph(a, b, c, d, e, f)
+	G, _ := BuildGraph(a, b, c, d, e, f)
 
 	// There are 6 vertices in the generated graph
 	// given that time t is incremented twice for each vertex
@@ -92,7 +92,7 @@ func TestGraph_DFSi(t *testing.T) {
 	e := []string{"wil", "jmh"}
 	f := []string{"kha", "dan", "wil"}
 
-	G, _ := NewGraph(a, b, c, d, e, f)
+	G, _ := BuildGraph(a, b, c, d, e, f)
 
 	// There are 6 vertices in the generated graph
 	// given that time t is incremented twice for each vertex
@@ -116,7 +116,7 @@ func TestGraph_GraphTranspose(t *testing.T) {
 	e := []string{"wil", "jmh"}
 	f := []string{"kha", "dan", "wil"}
 
-	G, _ := NewGraph(a, b, c, d, e, f)
+	G, _ := BuildGraph(a, b, c, d, e, f)
 	Gt := GraphTranspose(G)
 	if av, bv := G.VNum, Gt.VNum; av != bv {
 		t.Errorf("expected %d to be equal to %d", av, bv)
@@ -137,7 +137,7 @@ func TestGraph_TopSort(t *testing.T) {
 	g := []string{"socks", "shoes"}
 	h := []string{"watch"}
 	i := []string{"shoes"}
-	G, err := NewGraph(a, b, c, d, e, f, g, h, i)
+	G, err := BuildGraph(a, b, c, d, e, f, g, h, i)
 	if err != nil {
 		t.Error("expected nil error", err)
 	}
