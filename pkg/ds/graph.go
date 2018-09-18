@@ -121,9 +121,7 @@ func NewVertex(l string) *Vertex {
 // edges revered
 // Transpose of G = (V, E) is graph Gt = (V, Et)
 func GraphTranspose(g *Graph) *Graph {
-	gt := &Graph{}
-	gt.V = make(map[string]*Vertex)
-	gt.E = make(map[*Edge]struct{})
+	gt := NewGraph()
 
 	for _, v := range g.V {
 		if _, ok := gt.V[v.Label]; !ok {
