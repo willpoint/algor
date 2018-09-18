@@ -44,8 +44,9 @@ type Vertex struct {
 }
 
 // Edge is a pair of vertex (u, v)
-// represented as [0, 1] elements of the array
-type Edge [2]*Vertex
+type Edge struct {
+	u, v *Vertex
+}
 
 // NewEdge returns a reference to an edge (u, v) ∈ V // u2208- unicode
 func NewEdge(u, v *Vertex) *Edge {
@@ -59,7 +60,7 @@ type Graph struct {
 	E map[*Edge]struct{}
 
 	VNum int // number of vertices in G.V
-	ENum int // number of edges in the G.E
+	ENum int // number of edges in G.E
 }
 
 // NewGraph returns a references to a new Graph G
