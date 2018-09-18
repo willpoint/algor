@@ -24,38 +24,6 @@ const (
 	Black
 )
 
-// Graph ...
-type Graph struct {
-	Adj  map[string]*Vertex
-	VNum int // number of vertices in Graph
-}
-
-// NewGraph is a variadic function that initializes a
-// Graph G = (V, E) with a slice of slice of strings
-// representing the label for each vertex v in G.
-// The adjacency list for each vertex u ∈ V is represented
-// as elements following string at first index of the slice S[1, 1i)
-func NewGraph(ll ...[]string) (*Graph, error) {
-
-	G := &Graph{
-		Adj: make(map[string]*Vertex),
-	}
-
-	for _, j := range ll {
-		v := NewVertex(j[0])
-		for _, k := range j[1:] {
-			v.adj.AddHead(k)
-		}
-		// each adjacency list is composed of
-		// j[0] the item itself and j[1:]..., the elements
-		// making up the adjlist for j[0]
-		G.Adj[j[0]] = v
-		G.VNum++
-	}
-
-	return G, nil
-}
-
 // Vertex ...
 type Vertex struct {
 	Label       string
@@ -75,8 +43,56 @@ type Vertex struct {
 	adj *LinkedList
 }
 
-// Adjs ...
-func (v *Vertex) Adjs() *LinkedList {
+// Edge is a pair of vertex (u, v)
+// represented as [0, 1] elements of the array
+type Edge [2]*Vertex
+
+// NewEdge returns a reference to an edge (u, v) ∈ V // u2208- unicode
+func NewEdge(u, v *Vertex) *Edge {
+	return &Edge{u, v}
+}
+
+// Graph G = (V, E) where V is the vertex set
+// and E is the edge set containing edges (u, v) ∈ V
+type Graph struct {
+	V map[string]*Vertex
+	E map[*Edge]struct{}
+
+	VNum int // number of vertices in G.V
+	ENum int // number of edges in the G.E
+}
+
+// NewGraph is a variadic function that initializes a
+// Graph G = (V, E) with a slice of slice of strings
+// representing the label for each vertex v in G.
+// The adjacency list for each vertex u ∈ V is represented
+// as elements following string at first index of the slice S[1, 1i)
+func NewGraph(ll ...[]string) (*Graph, error) {
+
+	G := &Graph{
+		V: make(map[string]*Vertex),
+		E: make(map[*Edge]struct{}),
+	}
+
+	for _, j := range ll {
+		v := NewVertex(j[0])
+		for _, k := range j[1:] {
+			v.adj.AddHead(k)
+			G.E[NewEdge(v, NewVertex(k))] = struct{}{}
+			G.ENum++
+		}
+		// each adjacency list is composed of
+		// j[0] the item itself and j[1:]..., the elements
+		// making up the adjlist for j[0]
+		G.V[j[0]] = v
+		G.VNum++
+	}
+
+	return G, nil
+}
+
+// V ...
+func (v *Vertex) V() *LinkedList {
 	return v.adj
 }
 
@@ -100,27 +116,25 @@ func NewVertex(l string) *Vertex {
 // Transpose of G = (V, E) is graph Gt = (V, Et)
 func GraphTranspose(g *Graph) *Graph {
 	gt := &Graph{}
-	gt.Adj = make(map[string]*Vertex)
+	gt.V = make(map[string]*Vertex)
+	gt.E = make(map[*Edge]struct{})
 
-	for _, v := range g.Adj {
-		if _, ok := gt.Adj[v.Label]; !ok {
-			gt.Adj[v.Label] = NewVertex(v.Label)
+	for _, v := range g.V {
+		if _, ok := gt.V[v.Label]; !ok {
+			gt.V[v.Label] = NewVertex(v.Label)
 			gt.VNum++
 		}
-		// for each vertex->vertexList in g.Adj
-		// v is the vertex
-		// v.adj is the vertexList v points to
-		// the goal is to make all elements of v.adj
-		// point to a in their respective vertex
-		// within the new graph gt
 		curr := v.adj.Head
 		for curr != nil {
-			_, exists := gt.Adj[curr.E]
+			_, exists := gt.V[curr.E]
 			if !exists {
-				gt.Adj[curr.E] = NewVertex(curr.E)
+				gt.V[curr.E] = NewVertex(curr.E)
 				gt.VNum++
 			}
-			gt.Adj[curr.E].adj.AddHead(v.Label)
+			u := gt.V[curr.E]
+			u.adj.AddHead(v.Label)
+			gt.E[NewEdge(u, v)] = struct{}{}
+			gt.ENum++
 			curr = curr.Next
 		}
 	}
@@ -141,7 +155,7 @@ func GraphTranspose(g *Graph) *Graph {
 // It uses queue (Q) to maintain the breadth-first search sequence
 func (g *Graph) BFS(label string) error {
 
-	s, present := g.Adj[label]
+	s, present := g.V[label]
 	if !present {
 		return errors.New("vertex does not exist in graph")
 	}
@@ -159,7 +173,7 @@ func (g *Graph) BFS(label string) error {
 		// u.adj is a list of adjacent vertices from u
 		node := u.adj.Head
 		for node != nil {
-			v, present := g.Adj[node.E]
+			v, present := g.V[node.E]
 			if present { // if (u, v) is a member of E
 				if v.Color == White {
 					v.Color = Gray
@@ -179,8 +193,8 @@ func (g *Graph) BFS(label string) error {
 // assuming that BFS has already computed the breadth-first tree
 // for src
 func (g *Graph) PrintPath(src, dst string) {
-	s := g.Adj[src]
-	v := g.Adj[dst]
+	s := g.V[src]
+	v := g.V[dst]
 	if v == s {
 		fmt.Printf("%s(d-%d)\n", s.Label, s.Distance)
 	} else if v.Predecessor == nil {
@@ -196,7 +210,7 @@ func (g *Graph) PrintPath(src, dst string) {
 // it assumes a BFS has already been computed for the graph
 func (g *Graph) Diameter() int {
 	var max int
-	for _, v := range g.Adj {
+	for _, v := range g.V {
 		if v.Distance > max {
 			max = v.Distance
 		}
@@ -246,7 +260,7 @@ func (g *Graph) DFS() int {
 		// encountered node recursively
 		node := u.adj.Head
 		for node != nil {
-			v, present := g.Adj[node.E]
+			v, present := g.V[node.E]
 			if present {
 				if v.Color == White {
 					v.Predecessor = u
@@ -261,7 +275,7 @@ func (g *Graph) DFS() int {
 
 	}
 
-	for _, u := range g.Adj {
+	for _, u := range g.V {
 		if u.Color == White {
 			DFSVisit(u)
 		}
@@ -286,7 +300,7 @@ func (g *Graph) TopSort(ll *LinkedList) {
 		u.Color = Gray
 		node := u.adj.Head
 		for node != nil {
-			v, present := g.Adj[node.E]
+			v, present := g.V[node.E]
 			if present {
 				if v.Color == White {
 					v.Predecessor = u
@@ -300,7 +314,7 @@ func (g *Graph) TopSort(ll *LinkedList) {
 		u.FStamp = time
 		ll.AddHead(u.Label)
 	}
-	for _, u := range g.Adj {
+	for _, u := range g.V {
 		if u.Color == White {
 			DFSVisit(u)
 		}
@@ -321,7 +335,7 @@ func (g *Graph) IsDAG() bool {
 		u.Color = Gray
 		node := u.adj.Head
 		for node != nil {
-			v, present := g.Adj[node.E]
+			v, present := g.V[node.E]
 			if present {
 				if v.Color == White {
 					v.Predecessor = u
@@ -337,7 +351,7 @@ func (g *Graph) IsDAG() bool {
 		time++
 		u.FStamp = time
 	}
-	for _, u := range g.Adj {
+	for _, u := range g.V {
 		if u.Color == White {
 			DFSVisit(u)
 		}
@@ -347,13 +361,11 @@ func (g *Graph) IsDAG() bool {
 
 // DFSi is an iterative implementation of DFS
 // using a stack returning the count for the last
-// finishing time recoreded for each visit
+// finishing time recorded for each visit order(θ(V+E)-time)
 func (g *Graph) DFSi() int {
-
 	time := 0
-
 	var s *Vertex
-	for _, k := range g.Adj {
+	for _, k := range g.V {
 		s = k
 		break
 	}
@@ -365,13 +377,12 @@ func (g *Graph) DFSi() int {
 	stack = append(stack, s)
 
 	for len(stack) > 0 {
-
 		u := stack[len(stack)-1]
 		stack = stack[0 : len(stack)-1]
 
 		node := u.adj.Head
 		for node != nil {
-			v, present := g.Adj[node.E]
+			v, present := g.V[node.E]
 			if present {
 				if v.Color == White {
 					v.Predecessor = u
@@ -388,5 +399,4 @@ func (g *Graph) DFSi() int {
 		u.FStamp = time
 	}
 	return time
-
 }

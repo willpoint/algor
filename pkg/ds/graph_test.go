@@ -18,7 +18,7 @@ func TestGraph(t *testing.T) {
 		name string
 		want int
 	}{
-		{"abs", 4},
+		{"abs", 3},
 		{"jmh", 2},
 		{"imo", 3},
 		{"dan", 2},
@@ -27,11 +27,17 @@ func TestGraph(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			have := G.Adj[tt.name].VertexCount()
+			have := G.V[tt.name].VertexCount()
 			if have != tt.want {
 				t.Errorf("checking adj length - want %d, got %d", tt.want, have)
 			}
 		})
+	}
+
+	// test correctness of edge creation
+	edgeNum := 11 // by manual count (test graph is undirected)
+	if got := G.ENum; got != edgeNum {
+		t.Errorf("checking edge count - want %d, got %d", edgeNum, got)
 	}
 }
 
@@ -52,7 +58,7 @@ func TestGraph_BFS(t *testing.T) {
 		t.Error(err.Error())
 	}
 	expect := 5
-	if sp := G.Adj["min"].Distance; sp != expect {
+	if sp := G.V["min"].Distance; sp != expect {
 		t.Errorf("expected %d, got, %d", expect, sp)
 	}
 }
@@ -84,7 +90,7 @@ func TestGraph_DFSi(t *testing.T) {
 	c := []string{"imo", "abs", "kha", "wil"}
 	d := []string{"dan", "wil"}
 	e := []string{"wil", "jmh"}
-	f := []string{"kha", "dan"}
+	f := []string{"kha", "dan", "wil"}
 
 	G, _ := NewGraph(a, b, c, d, e, f)
 
@@ -96,6 +102,27 @@ func TestGraph_DFSi(t *testing.T) {
 	expected := G.VNum * 2
 	if got := G.DFSi(); got != expected {
 		t.Errorf("expected %d, got %d", expected, got)
+	}
+}
+
+// TestGraph_GraphTranspose tests that each outgoing vertex u -> v
+// is reversed to result in v -> u, the test therefore checks
+// that G and Gt maintain the same properties but for the new directions
+func TestGraph_GraphTranspose(t *testing.T) {
+	a := []string{"abs", "jmh", "imo", "wil", "kha"}
+	b := []string{"jmh", "imo", "abs"}
+	c := []string{"imo", "abs", "kha", "wil"}
+	d := []string{"dan", "wil"}
+	e := []string{"wil", "jmh"}
+	f := []string{"kha", "dan", "wil"}
+
+	G, _ := NewGraph(a, b, c, d, e, f)
+	Gt := GraphTranspose(G)
+	if av, bv := G.VNum, Gt.VNum; av != bv {
+		t.Errorf("expected %d to be equal to %d", av, bv)
+	}
+	if ae, be := G.ENum, Gt.ENum; ae != be {
+		t.Errorf("expected %d to be equal to %d", ae, be)
 	}
 }
 
@@ -127,7 +154,6 @@ func TestGraph_TopSort(t *testing.T) {
 	if prec := preceeds(pre, post, ss); prec != true {
 		t.Errorf("Expected %s to preceed %s", pre, post)
 	}
-
 }
 
 // preceeds tells if string a is seen before string b
