@@ -49,6 +49,7 @@ type Edge struct {
 }
 
 // NewEdge returns a reference to an edge (u, v) ∈ V // u2208- unicode
+// eg. weight w can be added for cases involving weighted graphs
 func NewEdge(u, v *Vertex) *Edge {
 	return &Edge{u, v}
 }
