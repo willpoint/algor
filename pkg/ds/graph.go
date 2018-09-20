@@ -331,7 +331,7 @@ func (g *Graph) TopSort(ll *LinkedList) {
 // a graph that has no back edge is a DAG.
 // for edge (u, v) if u.d > v.d then there is a backedge
 func (g *Graph) IsDAG() bool {
-	isDag := false
+	isDag := true
 	time := 0
 	var DFSVisit func(*Vertex)
 	DFSVisit = func(u *Vertex) {
@@ -346,7 +346,7 @@ func (g *Graph) IsDAG() bool {
 					v.Predecessor = u
 					DFSVisit(v)
 				} else if v.DStamp > u.DStamp {
-					isDag = true
+					isDag = false
 					return
 				}
 			}
