@@ -331,7 +331,7 @@ func (g *Graph) TopSort(ll *LinkedList) {
 // a graph that has no back edge is a DAG.
 // for edge (u, v) if u.d > v.d then there is a backedge
 func (g *Graph) IsDAG() bool {
-	backward := true
+	isDag := false
 	time := 0
 	var DFSVisit func(*Vertex)
 	DFSVisit = func(u *Vertex) {
@@ -346,7 +346,7 @@ func (g *Graph) IsDAG() bool {
 					v.Predecessor = u
 					DFSVisit(v)
 				} else if v.DStamp > u.DStamp {
-					backward = false
+					isDag = true
 					return
 				}
 			}
@@ -361,7 +361,7 @@ func (g *Graph) IsDAG() bool {
 			DFSVisit(u)
 		}
 	}
-	return backward
+	return isDag
 }
 
 // DFSi is an iterative implementation of DFS
