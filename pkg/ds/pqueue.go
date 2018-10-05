@@ -39,6 +39,8 @@ func (pq *PriorityQueue) RemoveMin() PQueuer {
 
 // PQueueItem ...
 type PQueueItem struct {
+	a int
+	B int
 }
 
 // PQueuer ...
