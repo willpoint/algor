@@ -122,3 +122,35 @@ func TestPrintPath(t *testing.T) {
 	PrintPath(out, G, Label("A"), Label("R"))
 	t.Log("printpath:\n", out.String())
 }
+
+func TestDiameter(t *testing.T) {
+	var param [][2]string
+	f, err := os.Open("dgraph.json")
+	if err != nil {
+		t.Errorf("reading graph: %v", err)
+	}
+	dec := json.NewDecoder(f)
+	err = dec.Decode(&param)
+	if err != nil {
+		t.Fatalf("decoding graph: %v", err)
+	}
+	G := BuildGraph(param)
+	BFS(G, Label(param[0][0]))
+	t.Log("diameter: \n", G.Diameter())
+}
+
+func TestDFS(t *testing.T) {
+	var param [][2]string
+	f, err := os.Open("dgraph.json")
+	if err != nil {
+		t.Errorf("reading graph: %v", err)
+	}
+	dec := json.NewDecoder(f)
+	err = dec.Decode(&param)
+	if err != nil {
+		t.Fatalf("decoding graph: %v", err)
+	}
+	G := BuildGraph(param)
+	DFS(G)
+	t.Log("dfs recursive: \n", G)
+}

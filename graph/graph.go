@@ -41,16 +41,15 @@ func NewVertex(l Label) *Vertex {
 	}
 }
 
-// String implements the Stringer interface // pi - u03c0
-// returns v[c: color, D: distance, pi: predecessor, adj: len(adj)]
+// String implements the Stringer interface // pi - `u03c0`
 func (v *Vertex) String() string {
 	var p Label = "NIL"
 	if v.Predecessor != nil {
 		p = v.Predecessor.Label
 	}
 	return fmt.Sprintf(
-		"%s[c: %d, D: %d, π: %s, adj: %d]",
-		v.Label, v.color, v.Distance, p, len(v.Adj),
+		"%s[c: %d, D: %d, π: %s, adj: %d, dstamp: %d, fstamp: %d]",
+		v.Label, v.color, v.Distance, p, len(v.Adj), v.dstamp, v.fstamp,
 	)
 }
 
@@ -69,7 +68,7 @@ func (e *Edge) String() string {
 	)
 }
 
-// NewEdge returns a reference to an edge (u, v) ∈ V // u2208
+// NewEdge returns a reference to an edge (u, v) ∈ V // `u2208`
 // eg. weight w can be added for cases involving weighted graphs
 func NewEdge(u, v *Vertex) *Edge {
 	return &Edge{
@@ -207,8 +206,11 @@ func Transpose(g *Graph) *Graph {
 // BFS assumes the input graph is represented using adjacency lists
 // the result should be the same for each source as the order of
 // visit is always mantained
-func BFS(G *Graph, l Label) {
-	s := G.V[l]
+func BFS(G *Graph, l Label) bool {
+	s, ok := G.V[l]
+	if !ok {
+		return false
+	}
 	s.color = gray
 	Q := []*Vertex{s}
 	for len(Q) > 0 {
@@ -225,13 +227,18 @@ func BFS(G *Graph, l Label) {
 		}
 		u.color = black
 	}
+	return true
 }
 
 // PrintPath returns a slice of vertices identified by theier labels
 // on a shortest path from s to v,
 // assuming that BFS has already been computed
-func PrintPath(out io.Writer, G *Graph, a, b Label) {
-	s, v := G.V[a], G.V[b]
+func PrintPath(out io.Writer, G *Graph, a, b Label) bool {
+	s, ok1 := G.V[a]
+	v, ok2 := G.V[b]
+	if !ok1 && !ok2 {
+		return false
+	}
 	if v == s {
 		fmt.Fprintln(out, s)
 	} else if v.Predecessor == nil {
@@ -239,5 +246,60 @@ func PrintPath(out io.Writer, G *Graph, a, b Label) {
 	} else {
 		PrintPath(out, G, s.Label, v.Predecessor.Label)
 		fmt.Fprintln(out, v)
+	}
+	return true
+}
+
+// Diameter of a tree T = (V, E) gives the largest of all
+// shortest-path distances in the tree
+// it assumes a BFS has already been computed for the graph
+func (G *Graph) Diameter() int {
+	var max int
+	for _, v := range G.V {
+		if v.Distance > max {
+			max = v.Distance
+		}
+	}
+	return max
+}
+
+// DFS strategy searches deeper into the graph whenever
+// possible. It explores edges out of the most discovered
+// vertex v that still has unexplored edges leaving it
+// Once all of v's edges have been explored, the search
+// `backtracks` to explore edges leaving the vertex from
+// which v was discovered
+// If any undiscovered vertices remain, then depth-first search
+// selects one of them as a new source, and it repeats the same
+// for that source.
+// When depth-first search discovers a vertex v during a scan of
+// the adjacency list of an already discovered vertex u,
+// it records this event by setting v's predecessor attribute
+// v{Predecessor} to u. The predecessor subgraph produced may
+// be composed of several trees because the search may repeat
+// from multiple sources.
+func DFS(G *Graph) {
+	var time int
+	var dfsVisit func(*Vertex)
+	dfsVisit = func(u *Vertex) {
+		u.color = gray
+		time++
+		u.dstamp = time
+		for _, j := range u.Adj {
+			v := G.V[j]
+			if v.color == white {
+				v.Predecessor = u
+				v.Distance = u.Distance + 1
+				dfsVisit(v)
+			}
+		}
+		u.color = black
+		time++
+		u.fstamp = time
+	}
+	for _, u := range G.V {
+		if u.color == white {
+			dfsVisit(u)
+		}
 	}
 }
