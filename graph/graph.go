@@ -179,13 +179,13 @@ func BuildWeightedGraph(pairs []struct {
 // edges reversed Transpose of G = (V, E) is graph Gt = (V, Et)
 func Transpose(g *Graph) *Graph {
 	Gt := NewGraph()
-	for _, v := range g.V {
-		if Gt.V[v.Label] == nil {
-			Gt.V[v.Label] = NewVertex(v.Label)
+	for _, ov := range g.V {
+		if Gt.V[ov.Label] == nil {
+			Gt.V[ov.Label] = NewVertex(ov.Label)
 			Gt.VNum++
 		}
-		u := Gt.V[v.Label]
-		for _, j := range v.Adj {
+		u := Gt.V[ov.Label]
+		for _, j := range ov.Adj {
 			u.Adj = append(u.Adj, j)
 			if Gt.V[j] == nil {
 				v := NewVertex(j)
@@ -227,17 +227,17 @@ func BFS(G *Graph, l Label) {
 	}
 }
 
-// ListPath returns a slice of vertices identified by theier labels
+// PrintPath returns a slice of vertices identified by theier labels
 // on a shortest path from s to v,
 // assuming that BFS has already been computed
-func ListPath(out io.Writer, G *Graph, a, b Label) {
+func PrintPath(out io.Writer, G *Graph, a, b Label) {
 	s, v := G.V[a], G.V[b]
 	if v == s {
 		fmt.Fprintln(out, s)
 	} else if v.Predecessor == nil {
 		fmt.Fprintf(out, "no path from %s to %v\n", a, b)
 	} else {
-		ListPath(out, G, s.Label, v.Predecessor.Label)
+		PrintPath(out, G, s.Label, v.Predecessor.Label)
 		fmt.Fprintln(out, v)
 	}
 }
