@@ -23,6 +23,7 @@ func TestBuildGraph(t *testing.T) {
 	if vnum := G.VNum; vnum != expected {
 		t.Errorf("expected %d to equal %d, got %d", vnum, expected, vnum)
 	}
+	t.Log("dgraph:\n", G)
 }
 
 func TestBuildWeightedGraph(t *testing.T) {
@@ -48,7 +49,7 @@ func TestBuildWeightedGraph(t *testing.T) {
 	if vnum := G.VNum; vnum != expected {
 		t.Errorf("expected %d to equal %d, got %d", vnum, expected, vnum)
 	}
-	t.Log(G)
+	t.Log("weighted graph:\n", G)
 }
 
 func TestTranspose(t *testing.T) {
@@ -67,6 +68,7 @@ func TestTranspose(t *testing.T) {
 	if Gt.VNum != G.VNum {
 		t.Error("G and Gt must have same vertex and edge lengths")
 	}
+	t.Log("transpose:\n", Gt)
 }
 
 // uniqueLabels in a graph = length of |V|
@@ -100,10 +102,10 @@ func TestBFS(t *testing.T) {
 	}
 	G := BuildGraph(param)
 	BFS(G, Label("A"))
-	t.Log(G)
+	t.Log("bfs: \n", G)
 }
 
-func TestListPath(t *testing.T) {
+func TestPrintPath(t *testing.T) {
 	var param [][2]string
 	f, err := os.Open("dgraph.json")
 	if err != nil {
@@ -117,6 +119,71 @@ func TestListPath(t *testing.T) {
 	G := BuildGraph(param)
 	BFS(G, Label("A"))
 	out := bytes.NewBuffer(make([]byte, 0, len(param)))
-	ListPath(out, G, Label("A"), Label("R"))
-	t.Log(out.String())
+	PrintPath(out, G, Label("A"), Label("R"))
+	t.Log("printpath:\n", out.String())
+}
+
+func TestDiameter(t *testing.T) {
+	var param [][2]string
+	f, err := os.Open("dgraph.json")
+	if err != nil {
+		t.Errorf("reading graph: %v", err)
+	}
+	dec := json.NewDecoder(f)
+	err = dec.Decode(&param)
+	if err != nil {
+		t.Fatalf("decoding graph: %v", err)
+	}
+	G := BuildGraph(param)
+	BFS(G, Label(param[0][0]))
+	t.Log("diameter: \n", G.Diameter())
+}
+
+func TestDFS(t *testing.T) {
+	var param [][2]string
+	f, err := os.Open("dgraph.json")
+	if err != nil {
+		t.Errorf("reading graph: %v", err)
+	}
+	dec := json.NewDecoder(f)
+	err = dec.Decode(&param)
+	if err != nil {
+		t.Fatalf("decoding graph: %v", err)
+	}
+	G := BuildGraph(param)
+	DFS(G)
+	t.Log("dfs recursive: \n", G)
+}
+
+func TestIsSinglyConnected(t *testing.T) {
+	var param [][2]string
+	f, err := os.Open("dgraph.json")
+	if err != nil {
+		t.Errorf("reading graph: %v", err)
+	}
+	dec := json.NewDecoder(f)
+	err = dec.Decode(&param)
+	if err != nil {
+		t.Fatalf("decoding graph: %v", err)
+	}
+	G := BuildGraph(param)
+	sc := IsSinglyConnected(G)
+	t.Log("singly connected \n", sc)
+}
+
+func TestTopSort(t *testing.T) {
+	var param [][2]string
+	f, err := os.Open("complx.json")
+	if err != nil {
+		t.Errorf("reading graph: %v", err)
+	}
+	dec := json.NewDecoder(f)
+	err = dec.Decode(&param)
+	if err != nil {
+		t.Fatalf("decoding graph: %v", err)
+	}
+	G := BuildGraph(param)
+	l := TopoSort(G)
+	t.Log("dress graph \n", G)
+	t.Log("topological sort \n", l)
 }
