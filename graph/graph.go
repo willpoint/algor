@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+
+	"github.com/willpoint/algor/list"
 )
 
 type color int
@@ -61,7 +63,7 @@ type Edge struct {
 
 // String implements the Stringer interface
 // to return (u, v):w(#) - # for weight
-func (e *Edge) String() string {
+func (e Edge) String() string {
 	return fmt.Sprintf(
 		"(%s, %s): w(%d)",
 		e.u.Label, e.v.Label, e.w,
@@ -70,22 +72,22 @@ func (e *Edge) String() string {
 
 // NewEdge returns a reference to an edge (u, v) ∈ V // `u2208`
 // eg. weight w can be added for cases involving weighted graphs
-func NewEdge(u, v *Vertex) *Edge {
-	return &Edge{
+func NewEdge(u, v *Vertex) Edge {
+	return Edge{
 		u: u,
 		v: v,
 	}
 }
 
 // NewWeightedEdge returns a new edge with a given weight
-func NewWeightedEdge(u, v *Vertex, w int) *Edge {
-	return &Edge{u, v, w}
+func NewWeightedEdge(u, v *Vertex, w int) Edge {
+	return Edge{u, v, w}
 }
 
 // Graph G = (V, E)
 type Graph struct {
 	V map[Label]*Vertex
-	E map[*Edge]bool
+	E map[Edge]bool
 
 	VNum, ENum int
 }
@@ -94,7 +96,7 @@ type Graph struct {
 func NewGraph() *Graph {
 	return &Graph{
 		V: make(map[Label]*Vertex),
-		E: make(map[*Edge]bool),
+		E: make(map[Edge]bool),
 	}
 }
 
@@ -122,6 +124,14 @@ func BuildGraph(pairs [][2]string) *Graph {
 	G := NewGraph()
 	for _, p := range pairs {
 		lu, lv := Label(p[0]), Label(p[1])
+		// if lv(2nd element of the pair) has a zero
+		// value then lv points to no other vertex
+		// we add to Vertex Set and continue
+		if lv == Label("") {
+			G.V[lu] = NewVertex(lu)
+			G.VNum++
+			continue
+		}
 		if G.V[lu] == nil {
 			u := NewVertex(lu)
 			G.VNum++
@@ -278,6 +288,12 @@ func (G *Graph) Diameter() int {
 // v{Predecessor} to u. The predecessor subgraph produced may
 // be composed of several trees because the search may repeat
 // from multiple sources.
+// Notes to remember when classifying an edge
+// when we first explore an edge (u, v), the color
+// of the vertex tells us something about the edge
+// 1. `white` indicates a tree edge
+// 2. `gray` indicates a back edge,
+// 3. `black` indicates a forward or cross edge
 func DFS(G *Graph) {
 	var time int
 	var dfsVisit func(*Vertex)
@@ -302,4 +318,98 @@ func DFS(G *Graph) {
 			dfsVisit(u)
 		}
 	}
+}
+
+// VertexWalk receives a second parameter fn(e *Vertex) that
+// is executed for every vertex completely visited
+func VertexWalk(G *Graph, fn func(e *Vertex)) {
+	var time int
+	var dfsVisit func(*Vertex)
+	dfsVisit = func(u *Vertex) {
+		u.color = gray
+		time++
+		u.dstamp = time
+		for _, j := range u.Adj {
+			v := G.V[j]
+			if v.color == white {
+				v.Predecessor = u
+				v.Distance = u.Distance + 1
+				dfsVisit(v)
+			}
+		}
+		u.color = black
+		time++
+		u.fstamp = time
+		fn(u)
+	}
+	for _, u := range G.V {
+		if u.color == white {
+			dfsVisit(u)
+		}
+	}
+}
+
+// EdgeWalk receives a second parameter fn(e *Edge) that
+// is executed for every edge during a depth first
+// encountered search of a graph G
+func EdgeWalk(G *Graph, fn func(e Edge)) {
+	var time int
+	var dfsVisit func(*Vertex)
+	dfsVisit = func(u *Vertex) {
+		u.color = gray
+		time++
+		u.dstamp = time
+		for _, j := range u.Adj {
+			v := G.V[j]
+			if v.color == white {
+				fn(NewEdge(u, v))
+				v.Predecessor = u
+				v.Distance = u.Distance + 1
+				dfsVisit(v)
+			} else {
+				fn(NewEdge(u, v))
+			}
+		}
+		u.color = black
+		time++
+		u.fstamp = time
+	}
+	for _, u := range G.V {
+		if u.color == white {
+			dfsVisit(u)
+		}
+	}
+}
+
+// IsSinglyConnected performs a check in a graph
+// and determines whether or not a directed graph is singly
+// connected. A singly-connected graph is defined as a graph G
+// that has at most one simple path from u to v for
+// all vertices u, u ∈ E
+func IsSinglyConnected(G *Graph) bool {
+	var ret = true
+	EdgeWalk(G, func(e Edge) {
+		// by induction, since an already visited
+		// vertex is colored gray, if a gray vertex
+		// visits a black vertex, it implies that it is
+		// visiting a vertex that has already been visited
+		// and thus has more than one simple path
+		if e.v.color == black {
+			ret = false
+			return
+		}
+	})
+	return ret
+}
+
+// TopoSort of a DAG produces a linear ordering of all vertices
+// such that if G contains an edge (u, v), then u appears before v
+// in the ordering - maintaining precedence
+// A graph with a cycle cannot produce such an ordering
+func TopoSort(G *Graph) *list.LinkedList {
+	l := list.NewLinkedList()
+	VertexWalk(G, func(v *Vertex) {
+		l.AddHead(string(v.Label))
+	})
+	return l
 }

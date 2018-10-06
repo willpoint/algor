@@ -154,3 +154,36 @@ func TestDFS(t *testing.T) {
 	DFS(G)
 	t.Log("dfs recursive: \n", G)
 }
+
+func TestIsSinglyConnected(t *testing.T) {
+	var param [][2]string
+	f, err := os.Open("dgraph.json")
+	if err != nil {
+		t.Errorf("reading graph: %v", err)
+	}
+	dec := json.NewDecoder(f)
+	err = dec.Decode(&param)
+	if err != nil {
+		t.Fatalf("decoding graph: %v", err)
+	}
+	G := BuildGraph(param)
+	sc := IsSinglyConnected(G)
+	t.Log("singly connected \n", sc)
+}
+
+func TestTopSort(t *testing.T) {
+	var param [][2]string
+	f, err := os.Open("dress.json")
+	if err != nil {
+		t.Errorf("reading graph: %v", err)
+	}
+	dec := json.NewDecoder(f)
+	err = dec.Decode(&param)
+	if err != nil {
+		t.Fatalf("decoding graph: %v", err)
+	}
+	G := BuildGraph(param)
+	l := TopoSort(G)
+	t.Log("dress graph \n", G)
+	t.Log("topological sort \n", l)
+}
