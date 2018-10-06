@@ -173,7 +173,7 @@ func TestIsSinglyConnected(t *testing.T) {
 
 func TestTopSort(t *testing.T) {
 	var param [][2]string
-	f, err := os.Open("dress.json")
+	f, err := os.Open("complx.json")
 	if err != nil {
 		t.Errorf("reading graph: %v", err)
 	}

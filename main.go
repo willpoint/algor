@@ -1,13 +1,23 @@
 package main
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+
+	"github.com/willpoint/algor/graph"
+)
 
 func main() {
 
-	var m map[string]int
-
-	_, ok := m["one"]
-	if ok {
-		fmt.Println("it exists")
+	var param [][2]string
+	f, err := os.Open("dgraph.json")
+	if err != nil {
+		fmt.Printf("reading graph: %v", err)
 	}
+	dec := json.NewDecoder(f)
+	err = dec.Decode(&param)
+
+	G := graph.BuildGraph(param)
+	graph.SCC(G)
 }

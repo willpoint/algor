@@ -59,14 +59,15 @@ func (v *Vertex) String() string {
 type Edge struct {
 	u, v *Vertex
 	w    int
+	etyp string // etyp describes the edge type of edge (u, v) in graph G
 }
 
 // String implements the Stringer interface
 // to return (u, v):w(#) - # for weight
 func (e Edge) String() string {
 	return fmt.Sprintf(
-		"(%s, %s): w(%d)",
-		e.u.Label, e.v.Label, e.w,
+		"(%s, %s), [etyp:%s] w(%d)",
+		e.u.Label, e.v.Label, e.etyp, e.w,
 	)
 }
 
@@ -81,7 +82,11 @@ func NewEdge(u, v *Vertex) Edge {
 
 // NewWeightedEdge returns a new edge with a given weight
 func NewWeightedEdge(u, v *Vertex, w int) Edge {
-	return Edge{u, v, w}
+	return Edge{
+		u: u,
+		v: v,
+		w: w,
+	}
 }
 
 // Graph G = (V, E)
@@ -294,7 +299,7 @@ func (G *Graph) Diameter() int {
 // 1. `white` indicates a tree edge
 // 2. `gray` indicates a back edge,
 // 3. `black` indicates a forward or cross edge
-func DFS(G *Graph) {
+func DFS(G *Graph) int {
 	var time int
 	var dfsVisit func(*Vertex)
 	dfsVisit = func(u *Vertex) {
@@ -305,8 +310,24 @@ func DFS(G *Graph) {
 			v := G.V[j]
 			if v.color == white {
 				v.Predecessor = u
+				e := NewEdge(u, v)
+				delete(G.E, e)
+				e.etyp = "tree edge"
+				G.E[e] = true
 				v.Distance = u.Distance + 1
 				dfsVisit(v)
+			} else {
+				if v.color == gray {
+					e := NewEdge(u, v)
+					delete(G.E, e)
+					e.etyp = "tree edge"
+					G.E[e] = true
+				} else {
+					e := NewEdge(u, v)
+					delete(G.E, e)
+					e.etyp = "cross edge"
+					G.E[e] = true
+				}
 			}
 		}
 		u.color = black
@@ -318,11 +339,12 @@ func DFS(G *Graph) {
 			dfsVisit(u)
 		}
 	}
+	return time
 }
 
 // VertexWalk receives a second parameter fn(e *Vertex) that
 // is executed for every vertex completely visited
-func VertexWalk(G *Graph, fn func(e *Vertex)) {
+func VertexWalk(G *Graph, fn func(e *Vertex)) int {
 	var time int
 	var dfsVisit func(*Vertex)
 	dfsVisit = func(u *Vertex) {
@@ -347,12 +369,13 @@ func VertexWalk(G *Graph, fn func(e *Vertex)) {
 			dfsVisit(u)
 		}
 	}
+	return time
 }
 
 // EdgeWalk receives a second parameter fn(e *Edge) that
 // is executed for every edge during a depth first
 // encountered search of a graph G
-func EdgeWalk(G *Graph, fn func(e Edge)) {
+func EdgeWalk(G *Graph, fn func(e Edge)) int {
 	var time int
 	var dfsVisit func(*Vertex)
 	dfsVisit = func(u *Vertex) {
@@ -379,6 +402,7 @@ func EdgeWalk(G *Graph, fn func(e Edge)) {
 			dfsVisit(u)
 		}
 	}
+	return time
 }
 
 // IsSinglyConnected performs a check in a graph
@@ -412,4 +436,42 @@ func TopoSort(G *Graph) *list.LinkedList {
 		l.AddHead(string(v.Label))
 	})
 	return l
+}
+
+// DFStranspose indicates a forward or cross edge
+func DFStranspose(G *Graph, t int) int {
+	time := t
+	var dfsVisit func(*Vertex)
+	dfsVisit = func(u *Vertex) {
+		u.color = gray
+		u.dstamp = time
+		time--
+		for _, j := range u.Adj {
+			v := G.V[j]
+			if v.color == white {
+				v.Predecessor = u
+				v.Distance = u.Distance + 1
+				dfsVisit(v)
+			}
+		}
+		u.color = black
+		u.fstamp = time
+		time--
+	}
+	for _, u := range G.V {
+		if u.color == white {
+			dfsVisit(u)
+		}
+	}
+	return time
+}
+
+// SCC (G *Graph)
+func SCC(G *Graph) *Graph {
+	time := DFS(G)
+	fmt.Println(G)
+	Gt := Transpose(G)
+	time = DFStranspose(Gt, time)
+	fmt.Println(Gt)
+	return Gt
 }
