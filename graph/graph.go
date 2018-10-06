@@ -16,6 +16,15 @@ const (
 	black              // all adjacent vertices have been visited
 )
 
+type edgetype string
+
+const (
+	treeEdge     edgetype = "TE"
+	crossEdge             = "CE"
+	forwardEdge           = "FE"
+	backwardEdge          = "BE"
+)
+
 var (
 	// ErrVertexExists ...
 	ErrVertexExists = errors.New("vertex already exists")
@@ -59,14 +68,14 @@ func (v *Vertex) String() string {
 type Edge struct {
 	u, v *Vertex
 	w    int
-	etyp string // etyp describes the edge type of edge (u, v) in graph G
+	etyp edgetype
 }
 
 // String implements the Stringer interface
 // to return (u, v):w(#) - # for weight
 func (e Edge) String() string {
 	return fmt.Sprintf(
-		"(%s, %s), [etyp:%s] w(%d)",
+		"(%s, %s), [etyp: %s], w(%d)",
 		e.u.Label, e.v.Label, e.etyp, e.w,
 	)
 }
@@ -300,7 +309,7 @@ func (G *Graph) Diameter() int {
 // 2. `gray` indicates a back edge,
 // 3. `black` indicates a forward or cross edge
 func DFS(G *Graph) int {
-	var time int
+	var time, forest int
 	var dfsVisit func(*Vertex)
 	dfsVisit = func(u *Vertex) {
 		u.color = gray
@@ -308,24 +317,26 @@ func DFS(G *Graph) int {
 		u.dstamp = time
 		for _, j := range u.Adj {
 			v := G.V[j]
+			e := NewEdge(u, v)
 			if v.color == white {
 				v.Predecessor = u
-				e := NewEdge(u, v)
 				delete(G.E, e)
-				e.etyp = "tree edge"
+				e.etyp = treeEdge
 				G.E[e] = true
 				v.Distance = u.Distance + 1
 				dfsVisit(v)
 			} else {
 				if v.color == gray {
-					e := NewEdge(u, v)
 					delete(G.E, e)
-					e.etyp = "tree edge"
+					e.etyp = backwardEdge
+					G.E[e] = true
+				} else if u.dstamp < v.dstamp {
+					delete(G.E, e)
+					e.etyp = forwardEdge
 					G.E[e] = true
 				} else {
-					e := NewEdge(u, v)
 					delete(G.E, e)
-					e.etyp = "cross edge"
+					e.etyp = crossEdge
 					G.E[e] = true
 				}
 			}
@@ -336,10 +347,11 @@ func DFS(G *Graph) int {
 	}
 	for _, u := range G.V {
 		if u.color == white {
+			forest++
 			dfsVisit(u)
 		}
 	}
-	return time
+	return forest
 }
 
 // VertexWalk receives a second parameter fn(e *Vertex) that
