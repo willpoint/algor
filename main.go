@@ -1,45 +1,59 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
 
-func solution(s string) int {
-	max := 0
-	seen := make(map[int]int)
-	for i := range s {
-		if num, balanced := isBalanced(s[i:]); balanced {
-			seen[i] = num
-		}
-	}
-	for i := range seen {
-		if seen[i] > max {
-			max = seen[i]
-		}
-	}
-	return max
+	"github.com/willpoint/algor/heap"
+)
+
+type elem []int
+
+func (e *elem) Less(i, j int) bool {
+	ee := *e
+	return ee[i] < ee[j]
 }
 
-func isBalanced(s string) (int, bool) {
-	i := make(map[string]int)
-	f := string(s[0])
-	n := ""
-	for _, j := range s {
-		l := string(j)
-		if l != n {
-			n = l
-		}
-		i[l]++
-	}
-	if len(i) == 2 {
-		if (i[f]+i[n])%2 == 1 {
-			return i[f] + i[n] - 1, true
-		}
-		return i[f] + i[n], true
-	}
-	return 0, false
+func (e *elem) Swap(i, j int) {
+	ee := *e
+	ee[i], ee[j] = ee[j], ee[i]
+}
+
+func (e *elem) Len() int {
+	return len(*e)
+}
+
+func (e *elem) Pop() interface{} {
+	k := *e
+	o, j := k[0], k[1:]
+	*e = j
+	return o
+}
+
+func (e *elem) Push(x interface{}) {
+	k := *e
+	k = append(k, x.(int))
+	*e = k
+}
+
+func (e elem) Smaller(i int, x interface{}) bool {
+	return x.(int) < e.Get(i).(int)
+}
+
+func (e elem) Get(i int) interface{} {
+	return e[i]
+}
+
+func (e *elem) Set(i int, x interface{}) {
+	k := *e
+	k[i] = x.(int)
 }
 
 func main() {
-	j := "cabbacc"
-	a := solution(j)
-	fmt.Println(a)
+	var e elem = []int{23, 77, 5, 7, 8, 107, 3, 11, 13}
+	h := heap.NewBinaryHeap(&e)
+	h.BuildMaxHeap()
+    h.HeapIncreaseKey(8, 73)
+    h.MaxHeapInsert(300)
+	fmt.Println(h.Keys)
+
 }
