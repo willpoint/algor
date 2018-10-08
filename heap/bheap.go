@@ -22,15 +22,12 @@ type Heaper interface {
 // BHeap is a binary heap - a data structure that can be
 // viewed as a nearly complete binary tree with each
 // node representing an element in the slice
-// The root of the binary heap is at elem[0] and given
-// a node i, we can compute the indices of its parent, left
+// The root of the binary heap is at elem[0]
+// Given a node i, we can compute the indices of its parent, left
 // child and right child
-// In the two kinds of binary heap which this type can be used
-// for, the user has the responsibility of calling the right methods
+// BHeap supports the two types of binary heap - max-heap and min-heap
+// the user has the responsibility of calling the right methods
 // on the BHeap type to maintain either a max-heap or min-heap property
-// for either a max-heap or a min-heap
-// while the reverse is the case for a min-heap
-// elem[parent(i)] <= elem[i], with smallest element at root
 // Practical applications of a min-heap is for priority queues
 // while max-heap can be used by a heap-sort algorithm
 type BHeap struct {
@@ -82,6 +79,24 @@ func (b *BHeap) MaxHeapify(i int) {
 	}
 }
 
+// MinHeapify maintains a min-heap property starting from element
+// at node i. In a min-heap elem[parent(i)] <= elem[i] and the
+// smallest element is at the root of the elem
+func (b *BHeap) MinHeapify(i int) {
+	smallest := i
+	l, r := b.left(i), b.right(i)
+	if l < b.HeapSize && b.Keys.Less(l, i) {
+		smallest = l
+	}
+	if r < b.HeapSize && b.Keys.Less(r, smallest) {
+		smallest = r
+	}
+	if smallest != i {
+		b.Keys.Swap(smallest, i)
+		b.MinHeapify(smallest)
+	}
+}
+
 // BuildMaxHeap produces a max-heap for an unordered slice
 func (b *BHeap) BuildMaxHeap() {
 	b.HeapSize = b.Keys.Len()
@@ -91,8 +106,22 @@ func (b *BHeap) BuildMaxHeap() {
 	}
 }
 
+// BuildMinHeap produces a min-heap for an unordered slice
+func (b *BHeap) BuildMinHeap() {
+	b.HeapSize = b.Keys.Len()
+	mid := b.Keys.Len()/2 - 1
+	for i := mid; i >= 0; i-- {
+		b.MinHeapify(i)
+	}
+}
+
 // HeapMaximum returns the maximum key in the heap
 func (b *BHeap) HeapMaximum() interface{} {
+	return b.Keys.Get(0)
+}
+
+// HeapMinimum return the minimum key in the heap
+func (b *BHeap) HeapMinimum() interface{} {
 	return b.Keys.Get(0)
 }
 
@@ -108,6 +137,18 @@ func (b *BHeap) ExtractMax() (interface{}, bool) {
 	return max, true
 }
 
+// ExtractMin returns the minimum key in the heap
+// and removes the element with the key
+func (b *BHeap) ExtractMin() (interface{}, bool) {
+	if b.HeapSize < 1 {
+		return nil, false
+	}
+	min := b.Keys.Pop()
+	b.HeapSize--
+	b.MinHeapify(0)
+	return min, true
+}
+
 // HeapIncreaseKey increases the key at index i provided
 // the key is greater than the existing one
 func (b *BHeap) HeapIncreaseKey(i int, key interface{}) bool {
@@ -116,6 +157,19 @@ func (b *BHeap) HeapIncreaseKey(i int, key interface{}) bool {
 	}
 	b.Keys.Set(i, key)
 	for i > 0 && b.Keys.Less(b.parent(i), i) {
+		b.Keys.Swap(i, b.parent(i))
+		i = b.parent(i)
+	}
+	return true
+}
+
+// HeapDecreasekey is an inverse of HeapIncreaseKey
+func (b *BHeap) HeapDecreasekey(i int, key interface{}) bool {
+	if !b.Keys.Smaller(i, key) {
+		return false
+	}
+	b.Keys.Set(i, key)
+	for i > 0 && b.Keys.Less(i, b.parent(i)) {
 		b.Keys.Swap(i, b.parent(i))
 		i = b.parent(i)
 	}

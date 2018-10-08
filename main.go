@@ -3,18 +3,13 @@ package main
 import (
 	"fmt"
 
-	"encoding/json"
-	"os"
-
-	"github.com/willpoint/algor/graph"
 	"github.com/willpoint/algor/heap"
 )
 
 type elem []int
 
-func (e *elem) Less(i, j int) bool {
-	ee := *e
-	return ee[i] < ee[j]
+func (e elem) Less(i, j int) bool {
+	return e[i] < e[j]
 }
 
 func (e *elem) Swap(i, j int) {
@@ -22,8 +17,8 @@ func (e *elem) Swap(i, j int) {
 	ee[i], ee[j] = ee[j], ee[i]
 }
 
-func (e *elem) Len() int {
-	return len(*e)
+func (e elem) Len() int {
+	return len(e)
 }
 
 func (e *elem) Pop() interface{} {
@@ -53,23 +48,9 @@ func (e *elem) Set(i int, x interface{}) {
 }
 
 func main() {
-
 	var e elem = []int{23, 77, 5, 7, 8, 107, 3, 11, 13}
 	h := heap.NewBinaryHeap(&e)
-	h.BuildMaxHeap()
-	h.HeapIncreaseKey(8, 73)
-	h.MaxHeapInsert(300)
+	h.BuildMinHeap()
+	h.ExtractMin()
 	fmt.Println(h.Keys)
-
-	var param [][2]string
-	f, err := os.Open("sgraph.json")
-	if err != nil {
-		fmt.Printf("reading graph: %v", err)
-	}
-	dec := json.NewDecoder(f)
-	err = dec.Decode(&param)
-	G := graph.BuildGraph(param)
-	fr := graph.DFS(G)
-	fmt.Println("forests: ", fr)
-	fmt.Println(G)
 }
