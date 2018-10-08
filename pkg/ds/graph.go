@@ -58,7 +58,7 @@ func NewEdge(u, v *Vertex) *Edge {
 // and E is the edge set containing edges (u, v) ∈ V
 type Graph struct {
 	V map[string]*Vertex
-	E map[*Edge]struct{}
+	E []*Edge
 
 	VNum int // number of vertices in G.V
 	ENum int // number of edges in G.E
@@ -68,7 +68,7 @@ type Graph struct {
 func NewGraph() *Graph {
 	return &Graph{
 		V: make(map[string]*Vertex),
-		E: make(map[*Edge]struct{}),
+		E: []*Edge{},
 	}
 }
 
@@ -85,7 +85,8 @@ func BuildGraph(ll ...[]string) (*Graph, error) {
 		v := NewVertex(j[0])
 		for _, k := range j[1:] {
 			v.adj.AddHead(k)
-			G.E[NewEdge(v, NewVertex(k))] = struct{}{}
+			G.E = append(G.E, NewEdge(v, NewVertex(k)))
+			// G.E[NewEdge(v, NewVertex(k))] = struct{}{}
 			G.ENum++
 		}
 		// each adjacency list is composed of
@@ -138,7 +139,8 @@ func GraphTranspose(g *Graph) *Graph {
 			}
 			u := gt.V[curr.E]
 			u.adj.AddHead(v.Label)
-			gt.E[NewEdge(u, v)] = struct{}{}
+			gt.E = append(gt.E, NewEdge(u, v))
+			// gt.E[NewEdge(u, v)] = struct{}{}
 			gt.ENum++
 			curr = curr.Next
 		}
@@ -331,7 +333,7 @@ func (g *Graph) TopSort(ll *LinkedList) {
 // a graph that has no back edge is a DAG.
 // for edge (u, v) if u.d > v.d then there is a backedge
 func (g *Graph) IsDAG() bool {
-	backward := true
+	isDag := true
 	time := 0
 	var DFSVisit func(*Vertex)
 	DFSVisit = func(u *Vertex) {
@@ -346,7 +348,7 @@ func (g *Graph) IsDAG() bool {
 					v.Predecessor = u
 					DFSVisit(v)
 				} else if v.DStamp > u.DStamp {
-					backward = false
+					isDag = false
 					return
 				}
 			}
@@ -361,7 +363,7 @@ func (g *Graph) IsDAG() bool {
 			DFSVisit(u)
 		}
 	}
-	return backward
+	return isDag
 }
 
 // DFSi is an iterative implementation of DFS
@@ -405,3 +407,31 @@ func (g *Graph) DFSi() int {
 	}
 	return time
 }
+
+// Solving for a Minimum Spanning Tree (MST)
+// The following definitions are required
+// A cut (S, V - S) of undirected graph G = (V, E) is a
+// partition of V.
+// We say that an edge (u, v) ∈ E crosses the cut (S, V - S)
+// if one of its endpoints is in S and the other in V - S. We say
+// that a cut respects a set A of edges if no edge in A crosses the cut
+// An edge is a light edge crossing a cut if its weight is the minimum
+// of any edge satisfying the property.
+// The rule for recognizing safe edges is given by the following theorem
+// Theorem 23.1
+// Let G = (V, E) be a connected, undirected graph with real-valued
+// weight function w defined on E.
+// Let A be a subset of E that is included in some minimum spanning tree
+// for G.
+// Let (S, V - S) be any cut of G that respects A and
+// Let (u, v) be a light edge crossing (S, V - S).
+// Then, edge (u, v) is safe for A.
+// Proof ======================================================
+// Let T be the minimum spanning tree that includes A,
+// and assume that T does not contain the light edge (u, v)
+// since if it does, we are done.
+// we shall construct another spanning tree T'
+// that includes A ∪ {(u, v)} by using a cut-and-paste technique
+// thereby showing that (u, v) is a safe edge for A.
+// The edge (u, v) forms a cycle with the edges on the simple path p
+// from u to v in T

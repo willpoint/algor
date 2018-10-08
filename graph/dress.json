@@ -1,0 +1,12 @@
+[
+    ["Shirt", "Tie"],
+    ["Tie", "Jacket"],
+    ["Shirt", "Belt"],
+    ["Belt", "Jacket"],
+    ["Undershorts", "Pants"],
+    ["Undershorts", "Shoes"],
+    ["Pants", "Belt"],
+    ["Pants", "Shoes"],
+    ["Socks", "Shoes"],
+    ["Watch", ""]
+]

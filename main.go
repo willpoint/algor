@@ -1,6 +1,7 @@
 package main
 
 import (
+<<<<<<< HEAD
 	"fmt"
 
 	"github.com/willpoint/algor/heap"
@@ -56,4 +57,26 @@ func main() {
     h.MaxHeapInsert(300)
 	fmt.Println(h.Keys)
 
+=======
+	"encoding/json"
+	"fmt"
+	"os"
+
+	"github.com/willpoint/algor/graph"
+)
+
+func main() {
+	var param [][2]string
+	f, err := os.Open("sgraph.json")
+	if err != nil {
+		fmt.Printf("reading graph: %v", err)
+	}
+	dec := json.NewDecoder(f)
+	err = dec.Decode(&param)
+	G := graph.BuildGraph(param)
+	fr := graph.DFS(G)
+	fmt.Println("forests: ", fr)
+	fmt.Println(G)
+
+>>>>>>> a2016099f853b819c894c0dd502dbeab6c290e7d
 }

@@ -1,19 +1,5 @@
 package heap
 
-// BHeap is a binary heap - a data structure that can be
-// viewed as a nearly complete binary tree with each
-// node representing an element in the slice
-// The root of the binary heap is at elem[0] and given
-// a node i, we can compute the indices of its parent, left
-// child and right child
-// In the two kinds of binary heap which this type can be used
-// for, the user has the responsibility of calling the right methods
-// on the BHeap type to maintain either a max-heap or min-heap property
-// for either a max-heap or a min-heap
-// while the reverse is the case for a min-heap
-// elem[parent(i)] <= elem[i], with smallest element at root
-// Practical applications of a min-heap is for priority queues
-// while max-heap can be used by a heap-sort algorithm
 import (
 	"container/heap"
 )
@@ -33,7 +19,20 @@ type Heaper interface {
 	Smaller(i int, key interface{}) bool
 }
 
-// BHeap ... ...
+// BHeap is a binary heap - a data structure that can be
+// viewed as a nearly complete binary tree with each
+// node representing an element in the slice
+// The root of the binary heap is at elem[0] and given
+// a node i, we can compute the indices of its parent, left
+// child and right child
+// In the two kinds of binary heap which this type can be used
+// for, the user has the responsibility of calling the right methods
+// on the BHeap type to maintain either a max-heap or min-heap property
+// for either a max-heap or a min-heap
+// while the reverse is the case for a min-heap
+// elem[parent(i)] <= elem[i], with smallest element at root
+// Practical applications of a min-heap is for priority queues
+// while max-heap can be used by a heap-sort algorithm
 type BHeap struct {
 	Length   int
 	HeapSize int
@@ -97,7 +96,8 @@ func (b *BHeap) HeapMaximum() interface{} {
 	return b.Keys.Get(0)
 }
 
-// ExtractMax ...
+// ExtractMax returns the maximum key in the heap and
+// removes the element with the key
 func (b *BHeap) ExtractMax() (interface{}, bool) {
 	if b.HeapSize < 1 {
 		return nil, false
@@ -108,7 +108,8 @@ func (b *BHeap) ExtractMax() (interface{}, bool) {
 	return max, true
 }
 
-// HeapIncreaseKey ...
+// HeapIncreaseKey increases the key at index i provided
+// the key is greater than the existing one
 func (b *BHeap) HeapIncreaseKey(i int, key interface{}) bool {
 	if b.Keys.Smaller(i, key) {
 		return false
@@ -121,7 +122,8 @@ func (b *BHeap) HeapIncreaseKey(i int, key interface{}) bool {
 	return true
 }
 
-// MaxHeapInsert ...
+// MaxHeapInsert inserts a new element into the heap with
+// the given key
 func (b *BHeap) MaxHeapInsert(key interface{}) {
 	b.HeapSize++
 	b.Keys.Push(key)
