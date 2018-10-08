@@ -1,9 +1,12 @@
 package main
 
 import (
-<<<<<<< HEAD
 	"fmt"
 
+	"encoding/json"
+	"os"
+
+	"github.com/willpoint/algor/graph"
 	"github.com/willpoint/algor/heap"
 )
 
@@ -50,22 +53,14 @@ func (e *elem) Set(i int, x interface{}) {
 }
 
 func main() {
+
 	var e elem = []int{23, 77, 5, 7, 8, 107, 3, 11, 13}
 	h := heap.NewBinaryHeap(&e)
 	h.BuildMaxHeap()
-    h.HeapIncreaseKey(8, 73)
-    h.MaxHeapInsert(300)
+	h.HeapIncreaseKey(8, 73)
+	h.MaxHeapInsert(300)
 	fmt.Println(h.Keys)
 
-=======
-	"encoding/json"
-	"fmt"
-	"os"
-
-	"github.com/willpoint/algor/graph"
-)
-
-func main() {
 	var param [][2]string
 	f, err := os.Open("sgraph.json")
 	if err != nil {
@@ -77,6 +72,4 @@ func main() {
 	fr := graph.DFS(G)
 	fmt.Println("forests: ", fr)
 	fmt.Println(G)
-
->>>>>>> a2016099f853b819c894c0dd502dbeab6c290e7d
 }
