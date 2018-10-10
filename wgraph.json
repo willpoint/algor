@@ -1,0 +1,16 @@
+[
+    {"pair":["A", "B"], "weight":10},
+    {"pair":["B", "C"], "weight":31},
+    {"pair":["Q", "D"], "weight":73},
+    {"pair":["D", "C"], "weight":64},
+    {"pair":["F", "A"], "weight":132},
+    {"pair":["E", "B"], "weight":321},
+    {"pair":["O", "J"], "weight":126},
+    {"pair":["J", "C"], "weight":85},
+    {"pair":["I", "Q"], "weight":16},
+    {"pair":["M", "W"], "weight":31},
+    {"pair":["Z", "W"], "weight":69},
+    {"pair":["U", "Z"], "weight":115},
+    {"pair":["A", "Z"], "weight":115},
+    {"pair":["R", "M"], "weight":312}
+]

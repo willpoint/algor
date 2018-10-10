@@ -16,15 +16,6 @@ const (
 	black              // all adjacent vertices have been visited
 )
 
-type edgetype string
-
-const (
-	treeEdge     edgetype = "TE"
-	crossEdge             = "CE"
-	forwardEdge           = "FE"
-	backwardEdge          = "BE"
-)
-
 var (
 	// ErrVertexExists ...
 	ErrVertexExists = errors.New("vertex already exists")
@@ -68,15 +59,14 @@ func (v *Vertex) String() string {
 type Edge struct {
 	u, v *Vertex
 	w    int
-	etyp edgetype
 }
 
 // String implements the Stringer interface
 // to return (u, v):w(#) - # for weight
 func (e Edge) String() string {
 	return fmt.Sprintf(
-		"(%s, %s), [etyp: %s], w(%d)",
-		e.u.Label, e.v.Label, e.etyp, e.w,
+		"(%s, %s), w(%d)",
+		e.u.Label, e.v.Label, e.w,
 	)
 }
 
@@ -178,15 +168,15 @@ func BuildWeightedGraph(pairs []struct {
 		lu, lv, lw := Label(p.Pair[0]), Label(p.Pair[1]), p.Weight
 		if G.V[lu] == nil {
 			u := NewVertex(lu)
-			G.VNum++
 			G.V[lu] = u
+			G.VNum++
 		}
 		u := G.V[lu]
 		u.Adj = append(u.Adj, Label(lv))
 		if G.V[lv] == nil {
 			v := NewVertex(lv)
-			G.VNum++
 			G.V[lv] = v
+			G.VNum++
 			edge := NewWeightedEdge(u, v, lw)
 			G.E[edge] = true
 		} else {
@@ -309,7 +299,7 @@ func (G *Graph) Diameter() int {
 // 2. `gray` indicates a back edge,
 // 3. `black` indicates a forward or cross edge
 func DFS(G *Graph) int {
-	var time, forest int
+	var time int
 	var dfsVisit func(*Vertex)
 	dfsVisit = func(u *Vertex) {
 		u.color = gray
@@ -317,28 +307,10 @@ func DFS(G *Graph) int {
 		u.dstamp = time
 		for _, j := range u.Adj {
 			v := G.V[j]
-			e := NewEdge(u, v)
 			if v.color == white {
 				v.Predecessor = u
-				delete(G.E, e)
-				e.etyp = treeEdge
-				G.E[e] = true
 				v.Distance = u.Distance + 1
 				dfsVisit(v)
-			} else {
-				if v.color == gray {
-					delete(G.E, e)
-					e.etyp = backwardEdge
-					G.E[e] = true
-				} else if u.dstamp < v.dstamp {
-					delete(G.E, e)
-					e.etyp = forwardEdge
-					G.E[e] = true
-				} else {
-					delete(G.E, e)
-					e.etyp = crossEdge
-					G.E[e] = true
-				}
 			}
 		}
 		u.color = black
@@ -347,11 +319,10 @@ func DFS(G *Graph) int {
 	}
 	for _, u := range G.V {
 		if u.color == white {
-			forest++
 			dfsVisit(u)
 		}
 	}
-	return forest
+	return time
 }
 
 // VertexWalk receives a second parameter fn(e *Vertex) that
@@ -415,27 +386,6 @@ func EdgeWalk(G *Graph, fn func(e Edge)) int {
 		}
 	}
 	return time
-}
-
-// IsSinglyConnected performs a check in a graph
-// and determines whether or not a directed graph is singly
-// connected. A singly-connected graph is defined as a graph G
-// that has at most one simple path from u to v for
-// all vertices u, u ∈ E
-func IsSinglyConnected(G *Graph) bool {
-	var ret = true
-	EdgeWalk(G, func(e Edge) {
-		// by induction, since an already visited
-		// vertex is colored gray, if a gray vertex
-		// visits a black vertex, it implies that it is
-		// visiting a vertex that has already been visited
-		// and thus has more than one simple path
-		if e.v.color == black {
-			ret = false
-			return
-		}
-	})
-	return ret
 }
 
 // TopoSort of a DAG produces a linear ordering of all vertices

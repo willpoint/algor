@@ -4,14 +4,12 @@ import (
 	"container/heap"
 )
 
-// Heaper interface implements the heap interface
+// Heaper interface embeds the heap interface
 // Pop() interface{}
 // Push(x interface{})
 // Len() int
 // Less(i, j int) bool
 // Swap(i, j int)
-// Get(i int) interface{}
-// Set(i int, x interface{})
 type Heaper interface {
 	heap.Interface
 	Get(i int) interface{}
@@ -182,4 +180,15 @@ func (b *BHeap) MaxHeapInsert(key interface{}) {
 	b.HeapSize++
 	b.Keys.Push(key)
 	b.HeapIncreaseKey(b.HeapSize-1, key)
+}
+
+// Sort sorts the heap in non decreasing order in place
+// it uses a max-heap in its implementation
+func (b *BHeap) Sort() {
+	b.BuildMaxHeap()
+	for i := b.Keys.Len() - 1; i > 0; i-- {
+		b.MaxHeapify(0)
+		b.Keys.Swap(0, i)
+		b.HeapSize--
+	}
 }
