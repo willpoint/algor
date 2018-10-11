@@ -1,3 +1,21 @@
+/*
+Package trie provides a string searching algorithm
+that preprocesses texts to enable quick search.
+The root is the start of a trie which records every
+character of a string in a collection such that
+from the root of the tree to any external node within
+the trie - the concatenation of labels give a string
+which is a member of string collection
+An improved trie saves more space by saving strings instead of
+characters and is essentially a Trie with more constraints
+referred to as a patricia trie. It ensures that each internal
+node in the trie has at least two children, by compressing chains
+of single-child nodes into individual edges and avoiding redundant
+nodes within the Trie
+eg. if vi is redundant for i = 1, ..., k - 1
+then v0 and vk are not redundant prevented by a concatenation
+of the labels vi, ..., vk
+*/
 package trie
 
 import (
@@ -5,47 +23,33 @@ import (
 )
 
 var (
-	// ErrPrefixStringExists ...
+	// ErrPrefixStringExists occurs when a prefix string already exists in the path
+	// to creating a new node
 	ErrPrefixStringExists = errors.New("prefix string exists for this new string")
 )
 
-// Trie provides a string searching algorithm
-// that preprocesses texts to enable quick search.
-// The root is the start of a trie which records every
-// character of a string in a collection such that
-// from the root of the tree to any external node within
-// the trie - the concatenation of labels give a string
-// which is a member of string collection
-// An improved trie saves more space by saving strings instead of
-// characters and is essentially a Trie with more constraints
-// referred to as a patricia trie. It ensures that each internal
-// node in the trie has at least two children, by compressing chains
-// of single-child nodes into individual edges and avoiding redundant
-// nodes within the Trie
-// eg. if vi is redundant for i = 1, ..., k - 1
-// then v0 and vk are not redundant prevented by a concatenation
-// of the labels vi, ..., vk
+// Trie structure
 type Trie struct {
-	Root  *TrieNode
+	Root  *TNode
 	Words int
 }
 
 // NewTrie returns a Trie with a root having initialized Children
 func NewTrie() *Trie {
-	root := &TrieNode{
-		Children: make(map[rune]*TrieNode),
+	root := &TNode{
+		Children: make(map[rune]*TNode),
 	}
 	return &Trie{root, 0}
 }
 
-// TrieNode uses a map to achieve a
+// TNode uses a map to achieve a
 // constant time search 0(1) or 0(log d)
 // The External property serves as a sentinel
 // to ensure no new string to be inserted has a prefix
 // of an existing string
-type TrieNode struct {
+type TNode struct {
 	Label    rune
-	Children map[rune]*TrieNode
+	Children map[rune]*TNode
 	External bool
 }
 
@@ -68,9 +72,9 @@ func (t *Trie) Insert(s string) error {
 	}
 
 	for i, j := range s[index:] {
-		tnode := &TrieNode{
+		tnode := &TNode{
 			Label:    j,
-			Children: make(map[rune]*TrieNode),
+			Children: make(map[rune]*TNode),
 		}
 		currNode.Children[j] = tnode
 		currNode = tnode
