@@ -1,9 +1,9 @@
 /*
 Package graph implements basic operations on the graph
-data structure including depth first search and breadth
-first search. It also provides an implementation for finding
+data structure including topological sort, depth first search
+and breadth first search. It also provides an implementation for finding
 strongly connected components of a graph using the graph's
-transpose
+transpose.
 */
 package graph
 
