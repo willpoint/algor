@@ -1,3 +1,14 @@
+/*
+Package heap provides a binary heap - a data structure that can be
+viewed as a nearly complete binary tree represented in a slice.
+implementing the Heaper interface which embeds the standard library
+heap.Interface and few more methods is all it takes to use the package.
+BHeap supports the two types of binary heap - max-heap and min-heap
+the user has the responsibility of calling the right methods
+on the BHeap type to maintain either a max-heap or min-heap property
+Practical applications of a min-heap is for priority queues
+while max-heap can be used by a heap-sort algorithm
+*/
 package heap
 
 import (
@@ -17,17 +28,7 @@ type Heaper interface {
 	Smaller(i int, key interface{}) bool
 }
 
-// BHeap is a binary heap - a data structure that can be
-// viewed as a nearly complete binary tree with each
-// node representing an element in the slice
-// The root of the binary heap is at elem[0]
-// Given a node i, we can compute the indices of its parent, left
-// child and right child
-// BHeap supports the two types of binary heap - max-heap and min-heap
-// the user has the responsibility of calling the right methods
-// on the BHeap type to maintain either a max-heap or min-heap property
-// Practical applications of a min-heap is for priority queues
-// while max-heap can be used by a heap-sort algorithm
+// BHeap structure
 type BHeap struct {
 	Length   int
 	HeapSize int

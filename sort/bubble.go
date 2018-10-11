@@ -1,4 +1,4 @@
-package sorting
+package sort
 
 // Bubble - θ(n2)-time) algorithm
 func Bubble(A []byte) {

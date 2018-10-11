@@ -1,4 +1,4 @@
-package sorting
+package sort
 
 // HeapSort attempts to reduce the number of comparisons that need to be
 // made when sorting an array by utilizing properties of a binary tree.

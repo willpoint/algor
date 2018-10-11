@@ -1,4 +1,4 @@
-package sorting
+package sort
 
 // QSort ...
 func QSort(b []byte) []byte {

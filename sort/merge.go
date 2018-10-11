@@ -1,4 +1,4 @@
-package sorting
+package sort
 
 // Merge algorithm to the wikipedia article on merge sort
 // This algorithm consists of two steps

@@ -1,3 +1,7 @@
+/*
+Package matrix  implements matrix operations for n by n matrices
+it is implemented with a single []float64 using column major
+*/
 package matrix
 
 import (

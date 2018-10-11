@@ -1,3 +1,6 @@
+/*
+Package list provides an implementation of a doubly linked list
+*/
 package list
 
 // LinkedList ...

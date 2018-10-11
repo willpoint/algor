@@ -1,4 +1,4 @@
-package sorting
+package sort
 
 // InsertionSort is achieved by spliting the
 // given collection into two subcollections

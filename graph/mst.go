@@ -1,11 +1,5 @@
 package graph
 
-import (
-	"fmt"
-
-	"github.com/willpoint/algor/heap"
-)
-
 // EdgeList is a list of edges
 type EdgeList []Edge
 
@@ -25,17 +19,7 @@ type EdgeList []Edge
 //   union(u, v)
 // return a
 func Kruskal(G *Graph) {
-	_ = make(map[*Vertex][]Edge)
-	_ = make(map[*Vertex][]Edge, G.VNum)
-	var edges EdgeList
-	for e := range G.E {
-		edges = append(edges, e)
-	}
-	h := heap.NewBinaryHeap(&edges)
-	h.Sort() // edges is now sorted in non decreasing order
-	for _, e := range edges {
-		fmt.Println(e.W)
-	}
+	// todo(uz)
 }
 
 // Get return the weight of the edge

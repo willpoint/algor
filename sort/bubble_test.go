@@ -1,14 +1,15 @@
-package sorting
+package sort
 
 import (
 	"testing"
 )
 
-func TestQSort(t *testing.T) {
+func TestBubbleSort(t *testing.T) {
 
 	ss := []byte("KJIHGFEDCBA")
 	expected := "ABCDEFGHIJK"
-	sorted := string(QSort(ss))
+	Bubble(ss)
+	sorted := string(ss)
 	if sorted != expected {
 		t.Errorf("expected %s, got %s", expected, sorted)
 	}
