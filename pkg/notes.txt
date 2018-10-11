@@ -1,3 +1,0 @@
-The ability to hold views that are not logically
-self-consistent is a hallmark of the human mental process.
-

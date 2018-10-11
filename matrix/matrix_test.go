@@ -1,4 +1,4 @@
-package ds
+package matrix
 
 import (
 	"reflect"

@@ -1,4 +1,4 @@
-package ds
+package tree
 
 import "errors"
 
@@ -116,7 +116,8 @@ func (t *RBT) rightRotate(u *RBNode) error {
 	return nil
 }
 
-// Insert ...
+// Insert is a redblack tree insert that ensures that
+// the redblacktree properties are maintained after every insert
 func (t *RBT) Insert(k int) {
 	z := t.NewRBNode(k)
 	y := t.Nil
