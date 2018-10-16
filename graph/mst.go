@@ -34,13 +34,13 @@ func Kruskal(G *Graph) {
 	h := heap.NewBinaryHeap(&edges)
 	h.Sort() // edges is now sorted in non decreasing order
 	for _, e := range edges {
-		fmt.Println(e.w)
+		fmt.Println(e.W)
 	}
 }
 
 // Get return the weight of the edge
 func (e EdgeList) Get(i int) interface{} {
-	return e[i].w
+	return e[i].W
 }
 
 // Set updates the weight of an edge - not needed
@@ -70,7 +70,7 @@ func (e *EdgeList) Pop() interface{} {
 
 // Less ...
 func (e EdgeList) Less(i, j int) bool {
-	return e[i].w < e[j].w
+	return e[i].W < e[j].W
 }
 
 // Len ...

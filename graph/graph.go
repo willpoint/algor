@@ -57,8 +57,8 @@ func (v *Vertex) String() string {
 
 // Edge E is a pair of vertices (u, v) ∈ E in Graph G = (V, E)
 type Edge struct {
-	u, v *Vertex
-	w    int
+	U, V *Vertex
+	W    int
 }
 
 // String implements the Stringer interface
@@ -66,7 +66,7 @@ type Edge struct {
 func (e Edge) String() string {
 	return fmt.Sprintf(
 		"(%s, %s), w(%d)",
-		e.u.Label, e.v.Label, e.w,
+		e.U.Label, e.V.Label, e.W,
 	)
 }
 
@@ -74,17 +74,17 @@ func (e Edge) String() string {
 // eg. weight w can be added for cases involving weighted graphs
 func NewEdge(u, v *Vertex) Edge {
 	return Edge{
-		u: u,
-		v: v,
+		U: u,
+		V: v,
 	}
 }
 
 // NewWeightedEdge returns a new edge with a given weight
 func NewWeightedEdge(u, v *Vertex, w int) Edge {
 	return Edge{
-		u: u,
-		v: v,
-		w: w,
+		U: u,
+		V: v,
+		W: w,
 	}
 }
 
