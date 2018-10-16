@@ -9,7 +9,7 @@ import (
 
 func TestBuildGraph(t *testing.T) {
 	var param [][2]string
-	f, err := os.Open("dgraph.json")
+	f, err := os.Open("testdata/dgraph.json")
 	if err != nil {
 		t.Errorf("reading graph: %v", err)
 	}
@@ -31,7 +31,7 @@ func TestBuildWeightedGraph(t *testing.T) {
 		Pair   [2]string `json:"pair"`
 		Weight int       `json:"weight"`
 	}
-	f, err := os.Open("wgraph.json")
+	f, err := os.Open("testdata/wgraph.json")
 	if err != nil {
 		t.Errorf("reading graph: %v", err)
 	}
@@ -54,7 +54,7 @@ func TestBuildWeightedGraph(t *testing.T) {
 
 func TestTranspose(t *testing.T) {
 	var param [][2]string
-	f, err := os.Open("dgraph.json")
+	f, err := os.Open("testdata/dgraph.json")
 	if err != nil {
 		t.Errorf("reading graph: %v", err)
 	}
@@ -91,7 +91,7 @@ func uniqueLabels(ll [][2]string) int {
 
 func TestBFS(t *testing.T) {
 	var param [][2]string
-	f, err := os.Open("dgraph.json")
+	f, err := os.Open("testdata/dgraph.json")
 	if err != nil {
 		t.Errorf("reading graph: %v", err)
 	}
@@ -107,7 +107,7 @@ func TestBFS(t *testing.T) {
 
 func TestPrintPath(t *testing.T) {
 	var param [][2]string
-	f, err := os.Open("dgraph.json")
+	f, err := os.Open("testdata/dgraph.json")
 	if err != nil {
 		t.Errorf("reading graph: %v", err)
 	}
@@ -125,7 +125,7 @@ func TestPrintPath(t *testing.T) {
 
 func TestDiameter(t *testing.T) {
 	var param [][2]string
-	f, err := os.Open("dgraph.json")
+	f, err := os.Open("testdata/dgraph.json")
 	if err != nil {
 		t.Errorf("reading graph: %v", err)
 	}
@@ -141,7 +141,7 @@ func TestDiameter(t *testing.T) {
 
 func TestDFS(t *testing.T) {
 	var param [][2]string
-	f, err := os.Open("dgraph.json")
+	f, err := os.Open("testdata/dgraph.json")
 	if err != nil {
 		t.Errorf("reading graph: %v", err)
 	}
@@ -157,7 +157,7 @@ func TestDFS(t *testing.T) {
 
 func TestTopSort(t *testing.T) {
 	var param [][2]string
-	f, err := os.Open("complx.json")
+	f, err := os.Open("testdata/complx.json")
 	if err != nil {
 		t.Errorf("reading graph: %v", err)
 	}
