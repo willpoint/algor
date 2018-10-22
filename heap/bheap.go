@@ -112,7 +112,6 @@ func (b *BHeap) BuildMaxHeap() {
 
 // BuildMinHeap produces a min-heap for an unordered slice
 func (b *BHeap) BuildMinHeap() {
-	b.HeapSize = b.Keys.Len()
 	mid := b.Keys.Len()/2 - 1
 	for i := mid; i >= 0; i-- {
 		b.MinHeapify(i)

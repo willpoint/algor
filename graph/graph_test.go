@@ -171,3 +171,24 @@ func TestTopSort(t *testing.T) {
 	t.Log("dress graph \n", G)
 	t.Log("topological sort \n", l)
 }
+
+func TestDijsktra(t *testing.T) {
+	var param []struct {
+		Pair   [2]string `json:"pair"`
+		Weight int       `json:"weight"`
+	}
+	f, err := os.Open("testdata/spgraph.json")
+	if err != nil {
+		t.Errorf("reading graph: %v", err)
+	}
+	dec := json.NewDecoder(f)
+	err = dec.Decode(&param)
+	if err != nil {
+		t.Fatalf("decoding graph: %v", err)
+	}
+	G := BuildWeightedGraph(param)
+	sp := Dijkstra(G, Label("s"))
+	for _, v := range sp {
+		t.Log(v)
+	}
+}
