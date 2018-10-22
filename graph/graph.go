@@ -65,15 +65,14 @@ func (v *Vertex) String() string {
 // Edge E is a pair of vertices (u, v) ∈ E in Graph G = (V, E)
 type Edge struct {
 	U, V *Vertex
-	W    int
 }
 
 // String implements the Stringer interface
 // to return (u, v):w(#) - # for weight
 func (e Edge) String() string {
 	return fmt.Sprintf(
-		"(%s, %s), w(%d)",
-		e.U.Label, e.V.Label, e.W,
+		"(%s, %s)",
+		e.U.Label, e.V.Label,
 	)
 }
 
@@ -87,18 +86,19 @@ func NewEdge(u, v *Vertex) Edge {
 }
 
 // NewWeightedEdge returns a new edge with a given weight
-func NewWeightedEdge(u, v *Vertex, w int) Edge {
-	return Edge{
-		U: u,
-		V: v,
-		W: w,
-	}
+func NewWeightedEdge(u, v *Vertex, w int) (Edge, int) {
+	return NewEdge(u, v), w
 }
 
 // Graph G = (V, E)
+// Since edges are implicit even for unweighted graphs,
+// E can be described as a map of Edge to weight
+// weights are unit weights (1) for unweighted edges
+// and take on real values 0 <= w <= maxInt for positive weights
+// and minInt <= w <= maxInt for negative weight edges
 type Graph struct {
 	V map[Label]*Vertex
-	E map[Edge]bool
+	E map[Edge]int
 
 	VNum, ENum int
 }
@@ -107,7 +107,7 @@ type Graph struct {
 func NewGraph() *Graph {
 	return &Graph{
 		V: make(map[Label]*Vertex),
-		E: make(map[Edge]bool),
+		E: make(map[Edge]int), // map edge to weights
 	}
 }
 
@@ -154,10 +154,10 @@ func BuildGraph(pairs [][2]string) *Graph {
 			G.VNum++
 			G.V[lv] = v
 			edge := NewEdge(G.V[lu], v)
-			G.E[edge] = true
+			G.E[edge] = 1
 		} else {
 			edge := NewEdge(G.V[lu], G.V[lv])
-			G.E[edge] = true
+			G.E[edge] = 1
 		}
 		G.ENum++
 	}
@@ -184,11 +184,11 @@ func BuildWeightedGraph(pairs []struct {
 			v := NewVertex(lv)
 			G.V[lv] = v
 			G.VNum++
-			edge := NewWeightedEdge(u, v, lw)
-			G.E[edge] = true
+			edge, weight := NewWeightedEdge(u, v, lw)
+			G.E[edge] = weight
 		} else {
-			edge := NewWeightedEdge(u, G.V[lv], lw)
-			G.E[edge] = true
+			edge, weight := NewWeightedEdge(u, G.V[lv], lw)
+			G.E[edge] = weight
 		}
 		G.ENum++
 	}
@@ -212,11 +212,11 @@ func Transpose(g *Graph) *Graph {
 				Gt.V[j] = v
 				Gt.VNum++
 				edge := NewEdge(v, u)
-				Gt.E[edge] = true
+				Gt.E[edge] = 1
 				Gt.ENum++
 			} else {
 				edge := NewEdge(Gt.V[j], u)
-				Gt.E[edge] = true
+				Gt.E[edge] = 1
 				Gt.ENum++
 			}
 		}
@@ -438,9 +438,7 @@ func DFStranspose(G *Graph, t int) int {
 // SCC (G *Graph)
 func SCC(G *Graph) *Graph {
 	time := DFS(G)
-	fmt.Println(G)
 	Gt := Transpose(G)
 	time = DFStranspose(Gt, time)
-	fmt.Println(Gt)
 	return Gt
 }

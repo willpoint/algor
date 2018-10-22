@@ -43,6 +43,11 @@ func NewBinaryHeap(h Heaper) *BHeap {
 	}
 }
 
+// Empty returns boolean signifying if the underlying heap is empty
+func (b *BHeap) Empty() bool {
+	return b.HeapSize < 1
+}
+
 // parent returns the index of an element with at index i
 func (b *BHeap) parent(i int) int {
 	return i >> 1 // produces the floor
@@ -127,7 +132,7 @@ func (b *BHeap) HeapMinimum() interface{} {
 // ExtractMax returns the maximum key in the heap and
 // removes the element with the key
 func (b *BHeap) ExtractMax() (interface{}, bool) {
-	if b.HeapSize < 1 {
+	if b.Empty() {
 		return nil, false
 	}
 	max := b.Keys.Pop()
@@ -139,7 +144,7 @@ func (b *BHeap) ExtractMax() (interface{}, bool) {
 // ExtractMin returns the minimum key in the heap
 // and removes the element with the key
 func (b *BHeap) ExtractMin() (interface{}, bool) {
-	if b.HeapSize < 1 {
+	if b.Empty() {
 		return nil, false
 	}
 	min := b.Keys.Pop()
